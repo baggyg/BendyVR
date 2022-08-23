@@ -1,0 +1,198 @@
+{
+  "actions": [
+    {
+      "name": "/actions/default/in/PoseLeftHand",
+      "type": "pose"
+    },
+    {
+      "name": "/actions/default/in/PoseRightHand",
+      "type": "pose"
+    },
+    {
+      "name": "/actions/default/in/SkeletonLeftHand",
+      "type": "skeleton",
+      "skeleton": "/skeleton/hand/left"
+    },
+    {
+      "name": "/actions/default/in/SkeletonRightHand",
+      "type": "skeleton",
+      "skeleton": "/skeleton/hand/right"
+    },
+    {
+      "name": "/actions/default/in/HeadsetOnHead",
+      "type": "boolean",
+      "requirement": "optional"
+    },
+    {
+      "name": "/actions/default/out/Haptic",
+      "type": "vibration"
+    },
+    {
+      "name": "/actions/DominantHand/in/Interact",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/DominantHand/in/Weapon",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/NonDominantHand/in/Pause",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/NonDominantHand/in/ExpoInvert",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/NonDominantHand/in/SeeingTool",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/MovementHand/in/Move",
+      "type": "vector2"
+    },
+    {
+      "name": "/actions/MovementHand/in/Teleport",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/MovementHand/in/Run",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/RotationHand/in/Rotate",
+      "type": "vector2"
+    },
+    {
+      "name": "/actions/RotationHand/in/SnapTurnLeft",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/RotationHand/in/Jump",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/RotationHand/in/UiUp",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/RotationHand/in/UiDown",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/RotationHand/in/Previous",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/RotationHand/in/Next",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/RotationHand/in/SnapTurnRight",
+      "type": "boolean"
+    },
+    {
+      "name": "/actions/RotationHand/in/Cancel",
+      "type": "boolean"
+    }
+  ],
+  "action_sets": [
+    {
+      "name": "/actions/default",
+      "usage": "leftright"
+    },
+    {
+      "name": "/actions/DominantHand",
+      "usage": "single"
+    },
+    {
+      "name": "/actions/NonDominantHand",
+      "usage": "single"
+    },
+    {
+      "name": "/actions/MovementHand",
+      "usage": "single"
+    },
+    {
+      "name": "/actions/RotationHand",
+      "usage": "single"
+    }
+  ],
+  "default_bindings": [
+    {
+      "controller_type": "vive_controller",
+      "binding_url": "bindings_vive_controller.json"
+    },
+    {
+      "controller_type": "oculus_touch",
+      "binding_url": "bindings_oculus_touch.json"
+    },
+    {
+      "controller_type": "knuckles",
+      "binding_url": "bindings_knuckles.json"
+    },
+    {
+      "controller_type": "holographic_controller",
+      "binding_url": "bindings_holographic_controller.json"
+    },
+    {
+      "controller_type": "vive_cosmos_controller",
+      "binding_url": "bindings_vive_cosmos_controller.json"
+    },
+    {
+      "controller_type": "vive_cosmos",
+      "binding_url": "binding_vive_cosmos.json"
+    },
+    {
+      "controller_type": "vive",
+      "binding_url": "binding_vive.json"
+    },
+    {
+      "controller_type": "indexhmd",
+      "binding_url": "binding_index_hmd.json"
+    },
+    {
+      "controller_type": "vive_pro",
+      "binding_url": "binding_vive_pro.json"
+    },
+    {
+      "controller_type": "rift",
+      "binding_url": "binding_rift.json"
+    },
+    {
+      "controller_type": "holographic_hmd",
+      "binding_url": "binding_holographic_hmd.json"
+    },
+    {
+      "controller_type": "vive_tracker_camera",
+      "binding_url": "binding_vive_tracker_camera.json"
+    }
+  ],
+  "localization": [
+    {
+      "language_tag": "en_US",
+      "/actions/default/in/HeadsetOnHead": "Headset on head (proximity sensor)",
+      "/actions/default/in/SkeletonLeftHand": "Skeleton (Left)",
+      "/actions/default/in/SkeletonRightHand": "Skeleton (Right)",
+      "/actions/default/out/Haptic": "Haptic",
+      "/actions/DominantHand/in/Interact": "Interact",
+      "/actions/RotationHand/in/Rotate": "Rotate",
+      "/actions/RotationHand/in/SnapTurnLeft": "Snap Turn Left",
+      "/actions/RotationHand/in/Jump": "Jump",
+      "/actions/RotationHand/in/UiUp": "UI Up",
+      "/actions/RotationHand/in/UiDown": "UI Down",
+      "/actions/RotationHand/in/Previous": "Previous",
+      "/actions/RotationHand/in/Next": "Next",
+      "/actions/MovementHand/in/Move": "Move",
+      "/actions/MovementHand/in/Teleport": "Teleport",
+      "/actions/MovementHand/in/Run": "Run",
+      "/actions/DominantHand/in/Weapon": "Weapon",
+      "/actions/RotationHand/in/SnapTurnRight": "Snap Turn Right",
+      "/actions/default/in/PoseRightHand": "Right Hand Pose",
+      "/actions/NonDominantHand/in/ExpoInvert": "Expo Invert",
+      "/actions/NonDominantHand/in/SeeingTool": "Seeing Tool",
+      "/actions/NonDominantHand/in/Pause": "Pause Game",
+      "/actions/RotationHand/in/Cancel": "Cancel (UI)"
+    }
+  ]
+}

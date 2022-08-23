@@ -1,0 +1,13 @@
+Find the Bendy and the Ink Machine directory.
+Example: "C:\Program Files (x86)\Steam\steamapps\common\Bendy and the Ink Machine".
+Bendy and the Ink Machine.exe is inside this directory.
+
+Extract the mod zip to anywhere (can be on your desktop or whatever, doesn't need to be in the game's directory).
+
+Then drag the Bendy and the Ink Machine.exe file, and drop it on top of BendyVRInstaller.exe.
+
+You should see a command line window with some stuff happening.
+
+In the end it should say "Installed successfully, probably. Press any key to close this console.".
+
+You can now start the game via Bendy and the Ink Machine.exe (or via Steam).
