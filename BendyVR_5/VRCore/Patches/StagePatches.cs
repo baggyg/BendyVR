@@ -1,7 +1,9 @@
-﻿using HarmonyLib;
+﻿using BendyVR_5.Helpers;
+using HarmonyLib;
 using TMG.Core;
 using UnityEngine;
 using UnityEngine.VR;
+using UnityEngine.XR;
 
 namespace BendyVR_5.Stage.Patches;
 
@@ -13,12 +15,10 @@ public class StagePatches : BendyVRPatch
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(InitializeGame), nameof(InitializeGame.InitPlayerSettings))]
-    private static void CreateStage(InitializeGame __instance)
-    {
+    private static void CreateVRCore(InitializeGame __instance)
+    {        
         gameManager = __instance.m_GameManager;
-        // All objects are eventually destroyed, unless they are children of this "reset object".
-        // So we make the reset object the parent of the VR Stage, to make sure we keep it alive.
-        VrStage.Create(gameManager);
+        VrCore.Create(gameManager);        
     }
 
     [HarmonyPostfix]
@@ -27,7 +27,12 @@ public class StagePatches : BendyVRPatch
     {
         // Getting camera manually because cameraController.camera isn't set up yet.
         //var camera = __instance.cameraController.GetComponentInChildren<Camera>();
+
+        //First Turn off the tracking of the weapon camera        
+        XRDevice.DisableAutoXRCameraTracking(GameManager.Instance.GameCamera.WeaponCamera, true);
+        
         var camera = GameManager.Instance.GameCamera.Camera;
+        Logs.WriteInfo("Setting Up VR Core (PlayerController Initialised)");
         StageInstance.SetUp(camera, __instance);
     }
 

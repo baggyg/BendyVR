@@ -3,14 +3,14 @@ using BendyVR_5.Settings;
 using BendyVR_5.Stage;
 using UnityEngine;
 
-namespace BendyVR_5.Locomotion;
+namespace BendyVR_5.Player;
 
 public class MovementDirection : MonoBehaviour
 {
     private Transform cameraDirectionTransform;
-    private VrStage stage;
+    private VrCore stage;
 
-    public static void Create(vgPlayerNavigationController navigationController, VrStage stage)
+    public static void Create(PlayerController navigationController, VrCore stage)
     {
         var instance = new GameObject("VrMovementDirection").AddComponent<MovementDirection>();
 
@@ -19,9 +19,9 @@ public class MovementDirection : MonoBehaviour
 
         // Usually NavigationController uses player camera forward as a basis for movement direction.
         // This dummy camera is used instead, so that movement direction can be independent of the camera rotation.
-        var dummyCamera = instance.gameObject.AddComponent<Camera>();
-        dummyCamera.enabled = false;
-        navigationController.playerCamera = dummyCamera;
+        //var dummyCamera = instance.gameObject.AddComponent<Camera>();
+        //dummyCamera.enabled = false;
+        //navigationController.playerCamera = dummyCamera;
     }
 
     private void Start()

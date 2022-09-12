@@ -11,7 +11,7 @@ public class VeryLateUpdateManager : MonoBehaviour
 {
     private Camera camera;
 
-    public static VeryLateUpdateManager Create(VrStage stage)
+    public static VeryLateUpdateManager Create(VrCore stage)
     {
         return stage.gameObject.AddComponent<VeryLateUpdateManager>();
     }

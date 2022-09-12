@@ -15,7 +15,8 @@ public class MenuCameraPatches : BendyVRPatch
     [HarmonyPatch(typeof(UIManager), nameof(UIManager.Init))]
     private static void SetupMenuCamera(UIManager __instance)
     {
-        __instance.Camera.farClipPlane = 5000;        
+        __instance.Camera.farClipPlane = 5000;
+        __instance.Camera.nearClipPlane = 0.01f;
     }
 
  }

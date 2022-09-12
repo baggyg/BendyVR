@@ -10,12 +10,13 @@ public class VrLimbManager : MonoBehaviour
 {
     public VrLaser Laser;
     private Transform playerTransform;
+    public PlayerController m_playerController;
     //private vgPlayerNavigationController navigationController;
     //private ToolPicker toolPicker;
     public VrHand NonDominantHand { get; private set; }
     public VrHand DominantHand { get; private set; }
     
-    public static VrLimbManager Create(VrStage stage)
+    public static VrLimbManager Create(VrCore stage)
     {
         var instance = new GameObject("VrLimbManager").AddComponent<VrLimbManager>();
         var instanceTransform = instance.transform;
@@ -31,12 +32,13 @@ public class VrLimbManager : MonoBehaviour
 
     public void SetUp(PlayerController playerController, Camera camera)
     {
+        m_playerController = playerController;
         var playerTransform = playerController ? playerController.transform : null;
         //navigationController = playerController ? playerController.navController : null;
         //var skeletonRoot = GetSkeletonRoot(playerTransform);
         //var armsMaterial = GetArmsMaterial(playerTransform);
-        DominantHand.SetUp(skeletonRoot, armsMaterial);
-        NonDominantHand.SetUp(skeletonRoot, armsMaterial);
+        DominantHand.SetUp(playerController);
+        NonDominantHand.SetUp(playerController);
         Laser.SetUp(camera);
         UpdateHandedness();
     }
@@ -76,36 +78,21 @@ public class VrLimbManager : MonoBehaviour
         UpdateHandedness();
     }
 
-    private static Material GetArmsMaterial(Transform playerTransform)
-    {
-        return !playerTransform
-            ? null
-            : playerTransform.Find("henry/body")?.GetComponent<SkinnedMeshRenderer>().materials[2];
-    }
-
     private void UpdateHandedness()
     {
-        if (!playerTransform || !navigationController) return;
+        if (!playerTransform || !m_playerController) return;
 
-        var scale = new Vector3(VrSettings.LeftHandedMode.Value && navigationController.enabled ? -1 : 1, 1, 1);
+        var scale = new Vector3(VrSettings.LeftHandedMode.Value && m_playerController.enabled ? -1 : 1, 1, 1);
 
-        henryTransform.localScale = scale;
+        //See what needs doing later
+        /*henryTransform.localScale = scale;
 
         var playerController = navigationController.playerController;
 
         if (playerController && playerController.inventory && playerController.inventory.heldObject)
-            playerController.inventory.heldObject.transform.localScale = scale;
+            playerController.inventory.heldObject.transform.localScale = scale;*/
     }
-
-    private Transform GetSkeletonRoot(Transform playerTransform)
-    {
-        if (playerTransform == null) return null;
-
-        henryTransform = playerTransform.Find("henry");
-
-        return henryTransform.Find("henryroot");
-    }
-
+    
     public void StopTrackingOriginalHands()
     {
         NonDominantHand.StopTrackingOriginalHands();

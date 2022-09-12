@@ -8,7 +8,7 @@ public class InteractiveUiTarget : UiTarget
 {
     protected override float MinAngleDelta => 45f;
 
-    public static InteractiveUiTarget Create(VrStage stage)
+    public static InteractiveUiTarget Create(VrCore stage)
     {
         var instance = new GameObject(nameof(InteractiveUiTarget)).AddComponent<InteractiveUiTarget>();
         instance.transform.SetParent(stage.transform, false);

@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using Valve.VR.InteractionSystem;
 
-namespace BendyVR_5.Locomotion;
+namespace BendyVR_5.Player;
 
 public class TeleportArc : MonoBehaviour
 {

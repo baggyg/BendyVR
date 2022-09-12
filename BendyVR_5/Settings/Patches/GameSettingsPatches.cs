@@ -17,7 +17,6 @@ public class GameSettingsPatches
     [HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.MotionBlur), MethodType.Setter)]
     [HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.ViewBobbing), MethodType.Setter)]
     [HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.ViewSwaying), MethodType.Setter)]
-    [HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.AA), MethodType.Setter)]
     [HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.Inverted), MethodType.Setter)]
     [HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.Crosshair), MethodType.Setter)]
     [HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.VolumetricLighting), MethodType.Setter)]
@@ -39,6 +38,7 @@ public class GameSettingsPatches
         __instance.CreateOption(ref __instance.m_AdvancedMenuOptions, __instance.m_AdvancedMenuParent, "Left Handed Mode", !VrSettings.LeftHandedMode.Value ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
         __instance.CreateOption(ref __instance.m_AdvancedMenuOptions, __instance.m_AdvancedMenuParent, "Swap Sticks", !VrSettings.SwapSticks.Value ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
         __instance.CreateOption(ref __instance.m_AdvancedMenuOptions, __instance.m_AdvancedMenuParent, "World Scale", VrSettings.WorldScale.Value.ToString());
+        __instance.CreateOption(ref __instance.m_AdvancedMenuOptions, __instance.m_AdvancedMenuParent, "HeightOffset", VrSettings.HeightOffset.Value.ToString());
 
 
         __instance.GenerateCategory(__instance.m_AdvancedMenuParent, "Advanced Options");
@@ -73,47 +73,53 @@ public class GameSettingsPatches
                 Logs.WriteInfo("SnapTurning is " + VrSettings.SnapTurning.Value.ToString());
                 VrSettings.SnapTurning.Value = !VrSettings.SnapTurning.Value;
                 Logs.WriteInfo("SnapTurning is now " + VrSettings.SnapTurning.Value.ToString());
-                __instance.m_AdvancedMenuOptions[0].UpdateValue((!VrSettings.SnapTurning.Value) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
+                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((!VrSettings.SnapTurning.Value) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
                 break;
             case 1:
                 Logs.WriteInfo("Snap Turn Angle is " + VrSettings.SnapTurnAngle.Value.ToString());
                 VrSettings.UpdateSnapTurnAngle(isRight);
                 Logs.WriteInfo("SnapTurning is now " + VrSettings.SnapTurnAngle.Value.ToString());
-                __instance.m_AdvancedMenuOptions[0].UpdateValue(VrSettings.GetSnapTurnAngle());
+                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue(VrSettings.GetSnapTurnAngle());
                 break;
             case 2:
                 Logs.WriteInfo("Smooth Rotation Speed is " + VrSettings.SmoothRotationSpeed.Value.ToString());
-                VrSettings.UpdateSnapTurnAngle(isRight);
+                VrSettings.UpdateSmoothTurnSpeed(isRight);
                 Logs.WriteInfo("Smooth Rotation Speed is now " + VrSettings.SmoothRotationSpeed.Value.ToString());
-                __instance.m_AdvancedMenuOptions[0].UpdateValue(VrSettings.SmoothRotationSpeed.Value.ToString());
+                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue(VrSettings.SmoothRotationSpeed.Value.ToString());
                 break;
             case 3:
                 Logs.WriteInfo("Controller Movement is " + VrSettings.ControllerBasedMovementDirection.Value.ToString());
                 VrSettings.ControllerBasedMovementDirection.Value = !VrSettings.ControllerBasedMovementDirection.Value;
                 Logs.WriteInfo("Controller Movement is now " + VrSettings.ControllerBasedMovementDirection.Value.ToString());
-                __instance.m_AdvancedMenuOptions[0].UpdateValue((!VrSettings.ControllerBasedMovementDirection.Value) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
+                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((!VrSettings.ControllerBasedMovementDirection.Value) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
                 break;
             case 4:
                 Logs.WriteInfo("LeftHandedMode is " + VrSettings.LeftHandedMode.Value.ToString());
                 VrSettings.LeftHandedMode.Value = !VrSettings.LeftHandedMode.Value;
                 Logs.WriteInfo("LeftHandedMode is now " + VrSettings.LeftHandedMode.Value.ToString());
-                __instance.m_AdvancedMenuOptions[0].UpdateValue((!VrSettings.LeftHandedMode.Value) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
+                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((!VrSettings.LeftHandedMode.Value) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
                 break;
             case 5:
                 Logs.WriteInfo("SwapSticks is " + VrSettings.SwapSticks.Value.ToString());
                 VrSettings.SwapSticks.Value = !VrSettings.SwapSticks.Value;
                 Logs.WriteInfo("SwapSticks is now " + VrSettings.SwapSticks.Value.ToString());
-                __instance.m_AdvancedMenuOptions[0].UpdateValue((!VrSettings.SwapSticks.Value) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
+                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((!VrSettings.SwapSticks.Value) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
                 break;
             case 6:
                 Logs.WriteInfo("WorldScale is " + VrSettings.WorldScale.Value.ToString());
                 VrSettings.UpdateWorldScale(isRight);
                 Logs.WriteInfo("WorldScale is now " + VrSettings.WorldScale.Value.ToString());
-                __instance.m_AdvancedMenuOptions[0].UpdateValue(VrSettings.WorldScale.Value.ToString());
+                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue(VrSettings.WorldScale.Value.ToString());
                 break;
             case 7:
+                Logs.WriteInfo("HeightOffset is now " + VrSettings.HeightOffset.Value.ToString());
+                VrSettings.UpdateHeightOffset(isRight);
+                Logs.WriteInfo("HeightOffset is now " + VrSettings.HeightOffset.Value.ToString());
+                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue(VrSettings.HeightOffset.Value.ToString());
+                break;
+            case 8:
                 __instance.m_OptionControls.HandleFullscreenValueChange();
-                __instance.m_AdvancedMenuOptions[0].UpdateValue((!GameManager.Instance.PlayerSettings.Fullscreen) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
+                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((!GameManager.Instance.PlayerSettings.Fullscreen) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
                 break;
             /*case 1:
                 {
@@ -130,7 +136,7 @@ public class GameSettingsPatches
                     m_AdvancedMenuOptions[1].UpdateValue(m_OptionControls.HandleResolutionValeChange(num2));
                     break;
                 }*/
-            case 8:
+            case 9:
                 {
                     int currentQuality = GameManager.Instance.PlayerSettings.currentQuality;
                     int num3 = currentQuality + num;
@@ -142,28 +148,28 @@ public class GameSettingsPatches
                     {
                         num3 = 0;
                     }
-                    __instance.m_AdvancedMenuOptions[2].UpdateValue(__instance.m_OptionControls.UpdateQuality(num3));
+                    __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue(__instance.m_OptionControls.UpdateQuality(num3));
                     break;
                 }
-            case 9:
-                __instance.m_OptionControls.HandleAAValueChange();
-                __instance.m_AdvancedMenuOptions[3].UpdateValue((!GameManager.Instance.PlayerSettings.AA) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
-                break;
             case 10:
-                __instance.m_OptionControls.HandleVSyncValueChange();
-                __instance.m_AdvancedMenuOptions[4].UpdateValue((!GameManager.Instance.PlayerSettings.VSync) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
+                __instance.m_OptionControls.HandleAAValueChange();
+                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((!GameManager.Instance.PlayerSettings.AA) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
                 break;
             case 11:
-                __instance.m_OptionControls.HandleDOFValueChange();
-                __instance.m_AdvancedMenuOptions[5].UpdateValue((!GameManager.Instance.PlayerSettings.DoF) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
+                __instance.m_OptionControls.HandleVSyncValueChange();
+                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((!GameManager.Instance.PlayerSettings.VSync) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
                 break;
             case 12:
-                __instance.m_OptionControls.HandleBloomValueChange();
-                __instance.m_AdvancedMenuOptions[6].UpdateValue((!GameManager.Instance.PlayerSettings.Bloom) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
+                __instance.m_OptionControls.HandleDOFValueChange();
+                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((!GameManager.Instance.PlayerSettings.DoF) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
                 break;
             case 13:
+                __instance.m_OptionControls.HandleBloomValueChange();
+                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((!GameManager.Instance.PlayerSettings.Bloom) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
+                break;
+            case 14:
                 __instance.m_OptionControls.HandleAmbientOcclusionValueChange();
-                __instance.m_AdvancedMenuOptions[7].UpdateValue((!GameManager.Instance.PlayerSettings.AmbientOcclusion) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
+                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((!GameManager.Instance.PlayerSettings.AmbientOcclusion) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
                 break;
             /*case 8:
                 m_OptionControls.HandleMotionBlurValueChange();

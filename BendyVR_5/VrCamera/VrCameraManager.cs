@@ -14,9 +14,9 @@ public class VRCameraManager : MonoBehaviour
     private int cameraCullingMask;
     private int pauseCameraCullingMask;
     private Transform playerTransform;
-    private VrStage stage;
+    private VrCore stage;
 
-    public static VRCameraManager Create(VrStage stage)
+    public static VRCameraManager Create(VrCore stage)
     {
         var instance = stage.gameObject.AddComponent<VRCameraManager>();
         instance.stage = stage;

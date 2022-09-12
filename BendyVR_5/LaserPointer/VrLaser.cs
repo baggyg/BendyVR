@@ -6,7 +6,7 @@ namespace BendyVR_5.LaserPointer;
 
 public class VrLaser : MonoBehaviour
 {
-    private const float laserLength = 1f;
+    private const float laserLength = 4f;
     private readonly IActionInput actionInput = ActionInputDefinitions.Interact;
     private bool ignoreNextInput;
 
@@ -67,7 +67,8 @@ public class VrLaser : MonoBehaviour
 
     private bool HasCurrentTarget()
     {
-        return vgHudManager.Instance && vgHudManager.Instance.currentTarget || target != null;
+        //return vgHudManager.Instance && vgHudManager.Instance.currentTarget || target != null;
+        return false;
     }
 
     private void UpdateLaserVisibility()

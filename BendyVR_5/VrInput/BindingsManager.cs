@@ -36,7 +36,7 @@ public class BindingsManager : MonoBehaviour
         {VirtualKey.Melee, ActionInputDefinitions.Weapon}
     };
 
-    public static BindingsManager Create(VrStage stage)
+    public static BindingsManager Create(VrCore stage)
     {
         var instance = stage.gameObject.AddComponent<BindingsManager>();
         return instance;

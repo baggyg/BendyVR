@@ -7,7 +7,7 @@ public class StaticUiTarget : UiTarget
 {
     protected override float MinAngleDelta => 20f;
 
-    public static StaticUiTarget Create(VrStage stage)
+    public static StaticUiTarget Create(VrCore stage)
     {
         var instance = new GameObject(nameof(StaticUiTarget)).AddComponent<StaticUiTarget>();
         instance.transform.SetParent(stage.transform, false);

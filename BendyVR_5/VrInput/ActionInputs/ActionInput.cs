@@ -1,4 +1,4 @@
-﻿//using BendyVR_5.Settings;
+﻿using BendyVR_5.Settings;
 using Valve.VR;
 
 namespace BendyVR_5.VrInput.ActionInputs;
@@ -16,10 +16,8 @@ public abstract class ActionInput<TAction> : IActionInput where TAction : ISteam
     {
         get
         {
-            //var isLeftHanded = VrSettings.LeftHandedMode.Value;
-            var isLeftHanded = false;
-            //var isSwappedSticks = VrSettings.SwapSticks.Value;
-            var isSwappedSticks = false;
+            var isLeftHanded = VrSettings.LeftHandedMode.Value;
+            var isSwappedSticks = VrSettings.SwapSticks.Value;
             if (SpecificAction.actionSet == SteamVR_Actions.DominantHand)
                 return isLeftHanded ? SteamVR_Input_Sources.LeftHand : SteamVR_Input_Sources.RightHand;
             if (SpecificAction.actionSet == SteamVR_Actions.NonDominantHand)

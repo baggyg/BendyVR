@@ -6,18 +6,18 @@ using BendyVR_5.Stage;
 using BendyVR_5.VrInput.ActionInputs;
 using UnityEngine;
 
-namespace BendyVR_5.Locomotion;
+namespace BendyVR_5.Player;
 
 public class TeleportController : MonoBehaviour
 {
     private const float triggerTeleportSquareDistance = 0.3f;
     private static readonly IActionInput teleportInput = ActionInputDefinitions.Teleport;
     private VrLimbManager limbManager;
-    private vgPlayerNavigationController navigationController;
+    private PlayerController navigationController;
     private TeleportArc teleportArc;
     private Transform teleportTarget;
 
-    public static TeleportController Create(VrStage stage, VrLimbManager limbManager)
+    public static TeleportController Create(VrCore stage, VrLimbManager limbManager)
     {
         var instance = stage.gameObject.AddComponent<TeleportController>();
         instance.limbManager = limbManager;
@@ -31,7 +31,7 @@ public class TeleportController : MonoBehaviour
     public void SetUp(PlayerController playerController)
     {
         navigationController =
-            playerController ? playerController.GetComponent<vgPlayerNavigationController>() : null;
+            playerController ? playerController.GetComponent<PlayerController>() : null;
     }
 
     private void Start()
@@ -49,7 +49,7 @@ public class TeleportController : MonoBehaviour
     {
         if (!navigationController || !VrSettings.Teleport.Value || !navigationController.enabled) return;
 
-        navigationController.playerController.forwardInput = IsTeleporting() ? 1 : 0;
+        //navigationController.playerController.forwardInput = IsTeleporting() ? 1 : 0;
     }
 
     private void OnEnable()
@@ -80,7 +80,7 @@ public class TeleportController : MonoBehaviour
     {
         return VrSettings.Teleport.Value &&
                teleportInput.ButtonValue && navigationController &&
-               navigationController.enabled && !vgPauseManager.Instance.isPaused;
+               navigationController.enabled && !GameManager.Instance.isPaused;
     }
 
     private void UpdatePlayerRotation()

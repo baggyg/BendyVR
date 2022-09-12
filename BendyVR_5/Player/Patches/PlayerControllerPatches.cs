@@ -1,4 +1,5 @@
 ﻿using BendyVR_5.Helpers;
+using DG.Tweening;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
@@ -12,15 +13,14 @@ namespace BendyVR_5.Player.Patches;
 [HarmonyPatch]
 public class PlayerControllerPatches : BendyVRPatch
 {
-	
-	/*[HarmonyPostfix]
+	[HarmonyPrefix]
 	[HarmonyPatch(typeof(PlayerController), nameof(PlayerController.FixedUpdate))]
-	private static void UpdateVRPlayerView(PlayerController __instance)
-    {
-		Quaternion headsetRotation = UnityEngine.XR.InputTracking.GetLocalRotation(UnityEngine.XR.XRNode.Head);
-		__instance.HeadContainer.localRotation = headsetRotation;
-		__instance.m_HandContainer.localRotation = headsetRotation;
-	}*/
+	[HarmonyPatch(typeof(PlayerController), nameof(PlayerController.Update))]
+	private static bool RemoveCorePlayerUpdates(PlayerController __instance)
+	{
+		return false; 
+	}
+
 
 
 	/*[HarmonyPrefix]

@@ -9,9 +9,9 @@ namespace BendyVR_5;
 
 public abstract class BendyVRPatch
 {
-    protected static VrStage StageInstance;
+    protected static VrCore StageInstance;
 
-    public static void SetStage(VrStage vrStage)
+    public static void SetStage(VrCore vrStage)
     {
         StageInstance = vrStage;
     }

@@ -58,6 +58,7 @@ public static class VrSettings
     public static ConfigEntry<bool> SwapSticks { get; private set; }
     public static ConfigEntry<bool> ControllerBasedMovementDirection { get; private set; }
     public static ConfigEntry<float> WorldScale { get; private set; }
+    public static ConfigEntry<float> HeightOffset { get; private set; }
     public static ConfigEntry<SnapTurnAngleOption> SnapTurnAngle { get; private set; }
     public static ConfigEntry<SmoothRotationSpeedOption> SmoothRotationSpeed { get; private set; }
 
@@ -86,6 +87,8 @@ public static class VrSettings
             "Swap movement / rotation sticks|Swaps controller sticks, independently of handedness.");
         WorldScale = config.Bind(renderingCategory, "WorldScale", 3.0f,
             "World Scale. Increase for World/Objects to look smaller|Decrease for World/Objects to look bigger");
+        HeightOffset = config.Bind(renderingCategory, "HeightOffset", 0.0f,
+            "Height Offset. Increase to be taller and vice versa");
     }
 
     public static string GetSnapTurnAngle()
@@ -103,14 +106,6 @@ public static class VrSettings
             SnapTurnAngle.Value = SnapTurnAngle.Value.Previous();        
     }
 
-    public static void UpdateWorldScale(bool higher)
-    {
-        if (higher)
-            WorldScale.Value += 0.5f;            
-        else
-            WorldScale.Value -= 0.5f;
-    }
-
     public static void UpdateSmoothTurnSpeed(bool higher)
     {
         if (higher)
@@ -118,6 +113,27 @@ public static class VrSettings
         else
             SmoothRotationSpeed.Value = SmoothRotationSpeed.Value.Previous();
     }
+
+    public static void UpdateWorldScale(bool higher)
+    {
+        if (higher)
+            WorldScale.Value += 0.5f;            
+        else
+        {
+            if(WorldScale.Value > 0.5f)
+                WorldScale.Value -= 0.5f;
+        }
+            
+    }
+
+    public static void UpdateHeightOffset(bool higher)
+    {
+        if (higher)
+            HeightOffset.Value += 0.5f;
+        else
+            HeightOffset.Value -= 0.5f;
+    }
+
 
     private static void SetUpResolution()
     {

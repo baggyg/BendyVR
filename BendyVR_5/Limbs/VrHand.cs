@@ -11,7 +11,7 @@ public class VrHand : MonoBehaviour
 {
     private FakeParenting handRootFakeParenting;
     private bool isDominant;
-    private Transform rootBone;
+    public PlayerController m_playerController;
 
     public static VrHand Create(Transform parent, bool isNonDominant = false)
     {
@@ -27,9 +27,10 @@ public class VrHand : MonoBehaviour
         return instance;
     }
 
-    public void SetUp(Transform playerRootBone)
+    public void SetUp(PlayerController playerController)
     {
         // Need to deactive and reactivate the object to make SteamVR_Behaviour_Pose work properly.
+        m_playerController = playerController;
         gameObject.SetActive(false);
         /*if (armsMaterial)
         {
@@ -38,10 +39,10 @@ public class VrHand : MonoBehaviour
             material.CopyPropertiesFromMaterial(armsMaterial);
         }*/
 
-        rootBone = playerRootBone;
+        //rootBone = playerRootBone;
 
         SetUpSettings();
-
+        AttachOriginalHand();
         gameObject.SetActive(true);
     }
 
@@ -76,7 +77,7 @@ public class VrHand : MonoBehaviour
         // because the player is controlling Henry's left hand with their right VR controller.
         var armBoneName = isDominant ? "Left" : "Right";
         transform.localScale = new Vector3(VrSettings.LeftHandedMode.Value ? -1 : 1, 1, 1);
-        EnableAnimatedHand(armBoneName);
+        //EnableAnimatedHand(armBoneName);
         SetUpPose(isLeft);
     }
 
@@ -95,43 +96,15 @@ public class VrHand : MonoBehaviour
         }
     }
 
-    private void FollowAllChildrenRecursive(Transform clone, Transform target, string handName)
+    private void AttachOriginalHand()
     {
-        foreach (Transform cloneChild in clone)
-        {
-            var targetChild = target.Find(cloneChild.name);
-            if (!targetChild) continue;
-
-            // Wedding ring and hand root are special cases, the originals need to follow the copies.
-            var isCloneHandRoot = cloneChild.name.Equals($"henryArm{handName}Hand");
-            if (isCloneHandRoot)
-                handRootFakeParenting = FakeParenting.Create(targetChild, cloneChild,
-                    FakeParenting.UpdateType.LateUpdate | FakeParenting.UpdateType.VeryLateUpdate);
-
-            var isCloneWeddingRing = cloneChild.name.Equals("HenryWeddingRing 1");
-            if (isCloneWeddingRing) FakeParenting.Create(targetChild, cloneChild);
-
-            if (isCloneWeddingRing) continue;
-
-            FollowAllChildrenRecursive(cloneChild, target.Find(cloneChild.name), handName);
-
-            if (isCloneHandRoot) continue;
-
-            // Clone hand bones will follow the original bones, to mimick the same animations.
-            CopyLocalTransformValues.Create(cloneChild.gameObject, targetChild);
-        }
-    }
-
-    private void EnableAnimatedHand(string handName)
-    {
-        if (!rootBone) return;
-
-        var armBone = rootBone.Find(
-            $"henryPelvis/henrySpineA/henrySpineB/henrySpineC/henrySpineD/henrySpider{handName}1/henrySpider{handName}2/henrySpider{handName}IK/henryArm{handName}Collarbone/henryArm{handName}1/henryArm{handName}2");
-
-        var clonedArmBone = transform.Find("henry/henryroot/henryPelvis");
-        if (!clonedArmBone) Logs.WriteError("found no cloned arm bone");
-        FollowAllChildrenRecursive(clonedArmBone, armBone, handName);
+        if (!isDominant)
+            return;
+                
+        handRootFakeParenting = FakeParenting.Create(m_playerController.m_HandContainer, transform, FakeParenting.UpdateType.LateUpdate | FakeParenting.UpdateType.VeryLateUpdate);
+        
+        // Clone hand bones will follow the original bones, to mimick the same animations.
+        //CopyLocalTransformValues.Create(cloneChild.gameObject, targetChild);
     }
 
     public void StopTrackingOriginalHands()

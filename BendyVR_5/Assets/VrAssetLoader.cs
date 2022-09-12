@@ -9,7 +9,7 @@ public static class VrAssetLoader
 {
     private const string assetsDir = "/BepInEx/plugins/baggyg-bendyvr/BendyVRAssets/AssetBundles/";
     public static readonly Dictionary<string, Shader> LivShaders = new();
-    public static GameObject ToolPickerPrefab { get; private set; }
+    
     public static Shader TMProShader { get; private set; }
     public static Shader FadeShader { get; private set; }
     public static GameObject VrSettingsMenuPrefab { get; private set; }
@@ -20,9 +20,14 @@ public static class VrAssetLoader
 
     public static void LoadAssets()
     {
-        var bodyBundle = LoadBundle("body");
+        /*var bodyBundle = LoadBundle("body");
         LeftHandPrefab = bodyBundle.LoadAsset<GameObject>("left-hand");
-        RightHandPrefab = bodyBundle.LoadAsset<GameObject>("right-hand");        
+        RightHandPrefab = bodyBundle.LoadAsset<GameObject>("right-hand");        */
+
+        Logs.WriteInfo("Loading VRHands Assets");
+        var vrBundle = LoadBundle("vrhands");
+        LeftHandPrefab = vrBundle.LoadAsset<GameObject>("vr_glove_left");
+        RightHandPrefab = vrBundle.LoadAsset<GameObject>("vr_glove_right");
 
         var uiBundle = LoadBundle("ui");
         TeleportTargetPrefab = uiBundle.LoadAsset<GameObject>("teleport-target");

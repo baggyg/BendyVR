@@ -4,7 +4,6 @@ using BendyVR_5.Debugging;
 using BendyVR_5.Helpers;
 using BendyVR_5.Player;
 using BendyVR_5.Limbs;
-using BendyVR_5.Locomotion;
 //using BendyVR_5.PlayerBody;
 using BendyVR_5.Settings;
 using BendyVR_5.UI;
@@ -17,17 +16,17 @@ using UnityEngine.XR;
 
 namespace BendyVR_5.Stage;
 
-public class VrStage : MonoBehaviour
+public class VrCore : MonoBehaviour
 {
-    private static VrStage instance;
+    private static VrCore instance;
     private static GameManager m_gameManager;
 
     private static readonly string[] fallbackCameraTagSkipScenes = {"Main", "PreLoad"};
     private BindingsManager bindingsManager;
     private VRPlayerController vrPlayerController;
-            
+
     //private BodyRendererManager bodyRendererManager;
-    
+    private Transform mNewCameraParent;
     private VRCameraManager cameraManager;
 
     private FadeOverlay fadeOverlay;
@@ -40,7 +39,7 @@ public class VrStage : MonoBehaviour
     //private RoomScaleBodyTransform roomScaleBodyTransform;
     //private StaticUiTarget staticUiTarget;
     private TeleportController teleportController;
-    private TurningController turningController;
+    
     private VeryLateUpdateManager veryLateUpdateManager;
     //private VrSettingsMenu vrSettingsMenu;
     
@@ -52,7 +51,7 @@ public class VrStage : MonoBehaviour
         
         m_gameManager = gm_parent;
 
-        var stageParent = new GameObject("VrStageParent")
+        var stageParent = new GameObject("VrCoreParent")
         {
             //transform = {parent = parent}
         };
@@ -60,22 +59,20 @@ public class VrStage : MonoBehaviour
         //stageParent.AddComponent<vgOnlyLoadOnce>().dontDestroyOnLoad = true;
 
         DontDestroyOnLoad(stageParent);
-        instance = new GameObject("VrStage").AddComponent<VrStage>();        
+        instance = new GameObject("VrCore").AddComponent<VrCore>();        
         instance.transform.SetParent(stageParent.transform, false);
         instance.vrPlayerController = VRPlayerController.Create(instance);
         
         //instance.cameraManager = VRCameraManager.Create(instance);
-        instance.limbManager = VrLimbManager.Create(instance);
+        //instance.limbManager = VrLimbManager.Create(instance);
         //instance.follow = stageParent.AddComponent<FakeParenting>();
         //instance.follow = FakeParenting.Create(stageParent.transform);
         //instance.interactiveUiTarget = InteractiveUiTarget.Create(instance);
         //instance.staticUiTarget = StaticUiTarget.Create(instance);
-        instance.teleportController = TeleportController.Create(instance, instance.limbManager);
-        instance.turningController = TurningController.Create(instance, instance.teleportController, instance.limbManager);
+        //instance.teleportController = TeleportController.Create(instance, instance.limbManager);
         instance.veryLateUpdateManager = VeryLateUpdateManager.Create(instance);
         //instance.roomScaleBodyTransform = RoomScaleBodyTransform.Create(instance, instance.teleportController);
         //instance.bodyRendererManager = BodyRendererManager.Create(instance, instance.teleportController, instance.limbManager);
-        //instance.vrSettingsMenu = VrSettingsMenu.Create(instance);
         instance.bindingsManager = BindingsManager.Create(instance);
         //instance.livManager = LivManager.Create(instance);
         //instance.fallbackCamera = new GameObject("VrFallbackCamera").AddComponent<Camera>();
@@ -100,36 +97,65 @@ public class VrStage : MonoBehaviour
         XRSettings.enabled = false;
 
         //Create something above both CameraContainer... Then Move CameraContainer and Camera itself to that. Then FakeParent Camera to CameraContainer
-        //(Since CameraContainer is used for interactions)
-        var newCameraParent = new GameObject("VrCameraParent").transform;
-        newCameraParent.SetParent(playerController.HeadContainer, false);
-        playerController.CameraParent.SetParent(newCameraParent);
-        GameManager.Instance.GameCamera.transform.SetParent(newCameraParent);
+        //(Since CameraContainer is used for interactions)        
+        //Set up a new camera parent
+        mNewCameraParent = new GameObject("VrCameraParent").transform;
+        //Set it to be below the head container
+        mNewCameraParent.SetParent(playerController.HeadContainer, false);
+        //Set Camera Container to be below new VrCameraParent
+        playerController.CameraParent.SetParent(mNewCameraParent);
+        //Set the Camera to also be below VrCameraParent
+        GameManager.Instance.GameCamera.transform.SetParent(mNewCameraParent);
+        //Move the Camera Container to match the VR Camera (which is auto tracked)
         FakeParenting.Create(playerController.CameraParent, GameManager.Instance.GameCamera.transform, FakeParenting.UpdateType.LateUpdate);
+
+        //Set Gamecamera planes
+        GameManager.Instance.GameCamera.Camera.nearClipPlane = 0.01f;        
 
         //Set Camera World Scale (Move Later)
         UpdateWorldScale();
+        ResetHeight();
+        VrSettings.WorldScale.SettingChanged += UpdateWorldScaleRealTime;
+        VrSettings.HeightOffset.SettingChanged += UpdateWorldScaleRealTime;
 
         XRSettings.enabled = true;
 
         //cameraManager.SetUp(mainCamera, playerTransform);
-        limbManager.SetUp(playerController, GameManager.Instance.GameCamera.Camera);
+        //limbManager.SetUp(playerController, GameManager.Instance.GameCamera.Camera);
         //interactiveUiTarget.SetUp(nextCamera);
         //staticUiTarget.SetUp(nextCamera);
-        teleportController.SetUp(playerController);
-        FadeOverlay.Create(GameManager.Instance.GameCamera.Camera);
+        //teleportController.SetUp(playerController);
+        //FadeOverlay.Create(GameManager.Instance.GameCamera.Camera);
         veryLateUpdateManager.SetUp(GameManager.Instance.GameCamera.Camera);
-        turningController.SetUp(playerController);
+        //turningController.SetUp(playerController);
         //roomScaleBodyTransform.SetUp(playerController);
         //bodyRendererManager.SetUp(playerController);
         //livManager.SetUp(nextCamera);
     }
 
+    private void UpdateWorldScaleRealTime(object sender, EventArgs e)
+    {
+        UpdateWorldScale();
+        ResetHeight();
+    }
+
     public void UpdateWorldScale()
     {
         float scale = VrSettings.WorldScale.Value;
-        GameManager.Instance.GameCamera.transform.localScale = new Vector3(scale, scale, scale);
-        //TODO We also need to adjust the height
+        //GameManager.Instance.GameCamera.transform.localScale = new Vector3(scale, scale, scale);
+        mNewCameraParent.localScale = new Vector3(scale, scale, scale);
+        GameManager.Instance.Player.m_HandContainer.localScale = new Vector3(scale, scale, scale);
+    }
+
+    private void ResetHeight()
+    {
+        float scale = VrSettings.WorldScale.Value;
+        float offset = (-1.5f * scale) + 0.7f;
+        offset += VrSettings.HeightOffset.Value;
+        mNewCameraParent.localPosition = new Vector3(0, offset, 0);
+        GameManager.Instance.Player.m_HandContainer.localPosition = new Vector3(0, offset, 0);
+        Logs.WriteInfo("Scale = " + scale);
+        Logs.WriteInfo("VrCameraParent Y = " + mNewCameraParent.localPosition.y);
     }
 
     private void Update()
@@ -214,13 +240,13 @@ public class VrStage : MonoBehaviour
         return bindingsManager && bindingsManager.GetDown(virtualKey);
     }
 
-    /*public Transform GetLaserTransform()
+    public Transform GetLaserTransform()
     {
         if (limbManager == null || limbManager.Laser == null) return null;
         return limbManager.Laser.transform;
-    }*/
+    }
 
-    /*public Transform GetDominantHand()
+    public Transform GetDominantHand()
     {
         return limbManager == null ? null : limbManager.DominantHand.transform;
     }
@@ -229,5 +255,5 @@ public class VrStage : MonoBehaviour
     public Transform GetMovementStickHand()
     {
         return limbManager == null ? null : limbManager.GetMovementStickHand().transform;
-    }*/
+    }
 }

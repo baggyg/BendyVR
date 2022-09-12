@@ -20,7 +20,25 @@ public class MainMenuPatches : BendyVRPatch
         "Particles"        
     };
 
-    [HarmonyPostfix]
+	//This removes the horrible gaze thing from the menus
+	//TODO possibly change this to laser later - not really necessary 
+	[HarmonyPostfix]
+	/*[HarmonyPatch(typeof(TitleScreenController), nameof(TitleScreenController.InitController))]
+	[HarmonyPatch(typeof(OptionsMenuController), nameof(OptionsMenuController.InitController))]*/
+	[HarmonyPatch(typeof(BaseUIController), nameof(BaseUIController.InitController))]
+	private static void RemoveCustomInput(BaseUIController __instance)
+	{
+		__instance.gameObject.GetComponent<GraphicRaycaster>().enabled = false;		
+	}
+
+	[HarmonyPostfix]
+	[HarmonyPatch(typeof(OptionsMenuController), nameof(OptionsMenuController.InitController))]
+	private static void RemoveCustomInput(TitleScreenController __instance)
+	{
+		__instance.gameObject.GetComponent<GraphicRaycaster>().enabled = false;
+	}
+
+	[HarmonyPostfix]
     [HarmonyPatch(typeof(TitleScreenController), nameof(TitleScreenController.InitController))]
     private static void DisableUnnecessaryMainMenuObjects(TitleScreenController __instance)
     {

@@ -58,7 +58,7 @@ public class PlayerInputPatches : BendyVRPatch
     [HarmonyPatch(typeof(PlayerInput), nameof(PlayerInput.Run))]
     private static bool PlayerRun(ref bool __result)
     {
-        __result = ActionInputDefinitions.Run.ButtonDown;
+        __result = ActionInputDefinitions.Run.ButtonValue;
         return false;
     }
     [HarmonyPrefix]

@@ -1,4 +1,5 @@
-﻿using BendyVR_5.Settings;
+﻿using BendyVR_5.Assets;
+using BendyVR_5.Settings;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
@@ -52,6 +53,7 @@ public class BendyVRPlugin : BaseUnityPlugin
             //HARMONY PATCHING OF METHODS
             VrSettings.SetUp(Config);
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+            VrAssetLoader.LoadAssets();
             InitSteamVR();
         }
         else
