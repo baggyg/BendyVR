@@ -129,9 +129,9 @@ public static class VrSettings
     public static void UpdateHeightOffset(bool higher)
     {
         if (higher)
-            HeightOffset.Value += 0.5f;
+            HeightOffset.Value += 0.1f;
         else
-            HeightOffset.Value -= 0.5f;
+            HeightOffset.Value -= 0.1f;
     }
 
 

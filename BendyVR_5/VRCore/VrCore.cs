@@ -18,7 +18,7 @@ namespace BendyVR_5.Stage;
 
 public class VrCore : MonoBehaviour
 {
-    private static VrCore instance;
+    public static VrCore instance;
     private static GameManager m_gameManager;
 
     private static readonly string[] fallbackCameraTagSkipScenes = {"Main", "PreLoad"};
@@ -133,6 +133,11 @@ public class VrCore : MonoBehaviour
         //livManager.SetUp(nextCamera);
     }
 
+    internal VRPlayerController GetVRPlayerController()
+    {
+        return vrPlayerController;
+    }
+
     private void UpdateWorldScaleRealTime(object sender, EventArgs e)
     {
         UpdateWorldScale();
@@ -152,9 +157,16 @@ public class VrCore : MonoBehaviour
         float scale = VrSettings.WorldScale.Value;
         float offset = (-1.5f * scale) + 0.7f;
         offset += VrSettings.HeightOffset.Value;
+        
         mNewCameraParent.localPosition = new Vector3(0, offset, 0);
-        GameManager.Instance.Player.m_HandContainer.localPosition = new Vector3(0, offset, 0);
+
+        GameManager.Instance.Player.m_HandContainer.localPosition = new Vector3(0, 0, 0);
+        //Measure the difference between VRCameraParent and Hand Container (Absolute) -> Thats the new Hand Container offset - Don't ask me to explain it
+        float handContainerOffset = mNewCameraParent.position.y - GameManager.Instance.Player.m_HandContainer.position.y;
+        GameManager.Instance.Player.m_HandContainer.localPosition = new Vector3(0, handContainerOffset, 0);
+        
         Logs.WriteInfo("Scale = " + scale);
+        Logs.WriteInfo("Hand Offset = " + handContainerOffset);
         Logs.WriteInfo("VrCameraParent Y = " + mNewCameraParent.localPosition.y);
     }
 

@@ -53,11 +53,50 @@ internal class VRPlayerController : MonoBehaviour
 		mDominantHand.parent = mPlayerController.m_HandContainer;
 		mLaser = VrLaser.Create(mDominantHand.transform);
 
-		//Move the hand below the tracekd hand		
-		mPlayerController.m_HandContainer.Find("Hand").parent = mDominantHand;
-		mPlayerController.m_HandContainer.localPosition = new Vector3(0.0f, 2.15f, 0.0f);
-		
+		//Move the hand below the tracked hand and scale correctly
+		Transform hand = mPlayerController.m_HandContainer.Find("Hand");
+		hand.parent = mDominantHand;
+		hand.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+        hand.eulerAngles = new Vector3(90f, 0.0f, 0.0f);
+		hand.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+
+		//Removed this as I think I meant Hand, not handcontainer
+		//mPlayerController.m_HandContainer.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
+
 		enabled = true;
+	}
+
+	public void SetupAxe()
+    {
+		Logs.WriteInfo("SetupAxe");
+
+		//Turn off animator on hand
+		Transform hand = mDominantHand.Find("Hand");
+		if (hand == null)
+		{
+			Logs.WriteError("Hand is Null");
+			return;
+		}
+		Animator _anim = hand.gameObject.GetComponent<Animator>();
+		if(_anim == null)
+        {
+			Logs.WriteError("Animator is Null");
+			return;
+		}
+		_anim.enabled = false;
+
+		//Set Up Axe Local Position
+		Transform axe = hand.Find("WeaponAnimator/Weapon_Axe");
+		axe.localPosition = new Vector3(0f, -.2f, 0f);
+
+		//Turn Off Glove
+		TurnOffDominantHand();
+	}
+
+	public void TurnOffDominantHand()
+    {
+		Transform gloveRenderMesh = mDominantHand.Find("vr_glove_model/renderMesh0");
+		gloveRenderMesh.GetComponent<SkinnedMeshRenderer>().enabled = false;
 	}
 
 	private void Update()

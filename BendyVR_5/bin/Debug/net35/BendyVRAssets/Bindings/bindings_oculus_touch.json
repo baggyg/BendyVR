@@ -301,15 +301,6 @@
         {
           "inputs": {
             "click": {
-              "output": "/actions/dominanthand/in/interact"
-            }
-          },
-          "mode": "button",
-          "path": "/user/hand/left/input/x"
-        },
-        {
-          "inputs": {
-            "click": {
               "output": "/actions/dominanthand/in/weapon"
             }
           },
@@ -323,7 +314,25 @@
             }
           },
           "mode": "button",
-          "path": "/user/hand/right/input/x"
+          "path": "/user/hand/left/input/y"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/dominanthand/in/interact"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/right/input/y"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/dominanthand/in/interact"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/right/input/b"
         }
       ]
     },
@@ -376,6 +385,24 @@
             "sub_mode": "touch"
           },
           "path": "/user/hand/right/input/joystick"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/movementhand/in/run"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/left/input/grip"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/movementhand/in/run"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/right/input/grip"
         }
       ]
     },
@@ -434,6 +461,24 @@
           },
           "mode": "button",
           "path": "/user/hand/right/input/x"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/nondominanthand/in/pause"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/right/input/b"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/nondominanthand/in/expoinvert"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/right/input/a"
         }
       ]
     },
@@ -564,6 +609,24 @@
           },
           "mode": "button",
           "path": "/user/hand/right/input/y"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/rotationhand/in/jump"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/right/input/a"
+        },
+        {
+          "inputs": {
+            "click": {
+              "output": "/actions/rotationhand/in/cancel"
+            }
+          },
+          "mode": "button",
+          "path": "/user/hand/right/input/b"
         }
       ]
     }
@@ -571,7 +634,8 @@
   "category": "steamvr_input",
   "controller_type": "oculus_touch",
   "description": "",
-  "name": "My Bendy and the Ink Machine configuration for Oculus Touch",
+  "interaction_profile": "",
+  "name": "Saved Bendy and the Ink Machine configuration for Oculus Touch Controller",
   "options": {},
   "simulated_actions": []
 }
