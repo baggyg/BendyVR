@@ -39,6 +39,8 @@ public class GameSettingsPatches
         __instance.CreateOption(ref __instance.m_AdvancedMenuOptions, __instance.m_AdvancedMenuParent, "Swap Sticks", !VrSettings.SwapSticks.Value ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
         __instance.CreateOption(ref __instance.m_AdvancedMenuOptions, __instance.m_AdvancedMenuParent, "World Scale", VrSettings.WorldScale.Value.ToString());
         __instance.CreateOption(ref __instance.m_AdvancedMenuOptions, __instance.m_AdvancedMenuParent, "HeightOffset", VrSettings.HeightOffset.Value.ToString());
+        __instance.CreateOption(ref __instance.m_AdvancedMenuOptions, __instance.m_AdvancedMenuParent, "velocityTrigger", (Mathf.Round(VrSettings.VelocityTrigger.Value * 10.0f) * 0.1f).ToString());
+        __instance.CreateOption(ref __instance.m_AdvancedMenuOptions, __instance.m_AdvancedMenuParent, "angularVelocityTrigger", (Mathf.Round(VrSettings.AngularVelocityTrigger.Value * 10.0f) * 0.1f).ToString());
 
 
         __instance.GenerateCategory(__instance.m_AdvancedMenuParent, "Advanced Options");
@@ -118,6 +120,18 @@ public class GameSettingsPatches
                 __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue(VrSettings.HeightOffset.Value.ToString());
                 break;
             case 8:
+                Logs.WriteInfo("VelocityTrigger is now " + VrSettings.VelocityTrigger.Value.ToString());
+                VrSettings.UpdateVelocityTrigger(isRight);
+                Logs.WriteInfo("VelocityTrigger is now " + VrSettings.VelocityTrigger.Value.ToString());
+                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((Mathf.Round(VrSettings.VelocityTrigger.Value * 10.0f) * 0.1f).ToString());
+                break;
+            case 9:
+                Logs.WriteInfo("AngularVelocityTrigger is now " + VrSettings.AngularVelocityTrigger.Value.ToString());
+                VrSettings.UpdateAngularVelocityTrigger(isRight);
+                Logs.WriteInfo("AngularVelocityTrigger is now " + VrSettings.AngularVelocityTrigger.Value.ToString());
+                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((Mathf.Round(VrSettings.AngularVelocityTrigger.Value * 10.0f) * 0.1f).ToString());
+                break;
+            case 10:
                 __instance.m_OptionControls.HandleFullscreenValueChange();
                 __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((!GameManager.Instance.PlayerSettings.Fullscreen) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
                 break;
@@ -136,7 +150,7 @@ public class GameSettingsPatches
                     m_AdvancedMenuOptions[1].UpdateValue(m_OptionControls.HandleResolutionValeChange(num2));
                     break;
                 }*/
-            case 9:
+            case 11:
                 {
                     int currentQuality = GameManager.Instance.PlayerSettings.currentQuality;
                     int num3 = currentQuality + num;
@@ -151,23 +165,23 @@ public class GameSettingsPatches
                     __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue(__instance.m_OptionControls.UpdateQuality(num3));
                     break;
                 }
-            case 10:
+            case 12:
                 __instance.m_OptionControls.HandleAAValueChange();
                 __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((!GameManager.Instance.PlayerSettings.AA) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
                 break;
-            case 11:
+            case 13:
                 __instance.m_OptionControls.HandleVSyncValueChange();
                 __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((!GameManager.Instance.PlayerSettings.VSync) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
                 break;
-            case 12:
+            case 14:
                 __instance.m_OptionControls.HandleDOFValueChange();
                 __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((!GameManager.Instance.PlayerSettings.DoF) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
                 break;
-            case 13:
+            case 15:
                 __instance.m_OptionControls.HandleBloomValueChange();
                 __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((!GameManager.Instance.PlayerSettings.Bloom) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
                 break;
-            case 14:
+            case 16:
                 __instance.m_OptionControls.HandleAmbientOcclusionValueChange();
                 __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((!GameManager.Instance.PlayerSettings.AmbientOcclusion) ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
                 break;

@@ -23,6 +23,14 @@ internal class VRPlayerController : MonoBehaviour
 	private Transform mNonDominantHand;
 	public VrLaser mLaser;
 	bool enabled = false;
+	bool hasAxe = false;
+	
+	private Vector3 velocity;
+	private Vector3 lastPos;
+
+	private Quaternion lastRotation;
+	public float velocityVectorLength = 0f;
+	public float angularVelocityVectorLength = 0f;
 
 	//Snap Turning Things
 	private const float smoothRotationBaseSpeed = 50f;
@@ -34,7 +42,7 @@ internal class VRPlayerController : MonoBehaviour
         instance.coreVR = vrcore;
 		return instance;
     }
-
+	
 	public void SetUp(PlayerController _playerController)
 	{
 		mPlayerController = _playerController;
@@ -91,6 +99,7 @@ internal class VRPlayerController : MonoBehaviour
 
 		//Turn Off Glove
 		TurnOffDominantHand();
+		hasAxe = true;
 	}
 
 	public void TurnOffDominantHand()
@@ -122,14 +131,30 @@ internal class VRPlayerController : MonoBehaviour
 			{
 				mPlayerController.m_JumpInput = PlayerInput.Jump();
 			}
-			//TODO Change this to be the dominant hand			
-			//mPlayerController.m_Interaction.UpdateInteraction(mPlayerController.m_CameraContainer.position, mPlayerController.m_CameraContainer.forward);
+						
+			//Intereaction Based on where laser is....
 			mPlayerController.m_Interaction.UpdateInteraction(mLaser.transform.position, mLaser.transform.forward);			
 			
 			if (mPlayerController.m_CanHaveSeeingTool && mPlayerController.m_CharacterController.isGrounded && mPlayerController.CurrentStatus != CombatStatus.Hiding && !mPlayerController.isLocked && mPlayerController.m_IsSeeingToolEnabled && PlayerInput.SeeingTool())
 			{
 				mPlayerController.isSeeingToolActive = !mPlayerController.isSeeingToolActive;
 				mPlayerController.UseSeeingTool(mPlayerController.isSeeingToolActive);
+			}
+
+			if (hasAxe)
+			{
+				//Velocity Delta
+				velocity = (mDominantHand.localPosition - lastPos) / Time.deltaTime;
+				lastPos = mDominantHand.localPosition;
+				velocityVectorLength = velocity.sqrMagnitude;
+
+				//Angular Velocity
+				Quaternion deltaRotation = mDominantHand.localRotation * Quaternion.Inverse(lastRotation);
+				lastRotation = mDominantHand.localRotation;
+				deltaRotation.ToAngleAxis(out var angle, out var axis);
+				angle *= Mathf.Deg2Rad;
+				Vector3 angularVelocity = (1.0f / Time.deltaTime) * angle * axis;
+				angularVelocityVectorLength = angularVelocity.magnitude;				
 			}
 		}
 	}
@@ -199,6 +224,8 @@ internal class VRPlayerController : MonoBehaviour
 		turnController();
 		//PlayerLookRotations(mPlayerController.transform, mPlayerController.m_HeadContainer, mPlayerController.m_HandContainer);
 		mPlayerController.m_PlayerLook.UpdateCursorLock();
+
+		
 	}
 
 	private void turnController()
@@ -257,71 +284,24 @@ internal class VRPlayerController : MonoBehaviour
 		coreVR.FadeToClear();
 		isSnapTurning = false;
 	}
-
-	/*public void PlayerLookRotations(Transform character, params Transform[] cameras)
-	{
-		for (int i = 0; i < cameras.Length; i++)
-		{
-			if ((bool)cameras[i])
-			{
-				PlayerLookRotations(character, cameras[i], hasGravity: true);
-			}
-		}
-	}*/
-
-	/*private void PlayerLookRotations(Transform character, Transform camera, bool hasGravity)
-    {
-		//We no longer need to know about m_Inputs. Lets do the snap / smooth first.
-
 		
-		if (!IsNullRotation(m_InputX, m_InputY))
-		{
-			if (hasGravity)
-			{
-				m_CharacterTargetRotation *= Quaternion.Euler(0f, m_InputX, 0f);
-				if (hasHorizontalLock)
-				{
-					m_CharacterTargetRotation = ClampRotationYAxis(m_CharacterTargetRotation, 0f - m_HorizontalClamp, m_HorizontalClamp);
-				}
-				character.localRotation = m_CharacterTargetRotation;
-				if ((bool)camera)
-				{
-					m_CameraTargetRotation *= Quaternion.Euler(m_InputY, 0f, 0f);
-					if (m_ClampVerticalRotation)
-					{
-						m_CameraTargetRotation = ClampRotationXAxis(m_CameraTargetRotation, 0f - m_VerticalClamp, m_VerticalClamp);
-					}
-					camera.localRotation = m_CameraTargetRotation;
-					Vector3 localEulerAngles = camera.localEulerAngles;
-					localEulerAngles.z = 0f;
-					camera.localEulerAngles = localEulerAngles;
-				}
-			}
-			else
-			{
-				m_CharacterTargetRotation *= Quaternion.Euler(m_InputY, m_InputX, 0f);
-				character.localRotation = m_CharacterTargetRotation;
-			}
-		}
-		else
-		{
-			character.localRotation = m_CharacterTargetRotation;
-			if ((bool)camera)
-			{
-				camera.localRotation = m_CameraTargetRotation;
-			}
-		}
-		UpdateCursorLock();
-	}*/
 
 	private void Move(float speed)
 	{
 		//TODO Change to be the dominant hand if that setting is set
-		Vector3 vector = mPlayerController.transform.forward * mPlayerController.m_Input.y + mPlayerController.transform.right * mPlayerController.m_Input.x;
+		Vector3 vector;
+		if (VrSettings.ControllerBasedMovementDirection.Value == true)
+			vector = mNonDominantHand.forward * mPlayerController.m_Input.y + mPlayerController.transform.right * mPlayerController.m_Input.x;
+		else
+			vector = GameManager.Instance.GameCamera.transform.forward * mPlayerController.m_Input.y + mPlayerController.transform.right * mPlayerController.m_Input.x;
+
+		//vector = mPlayerController.transform.forward * mPlayerController.m_Input.y + mPlayerController.transform.right * mPlayerController.m_Input.x;
 		float num = Vector3.Angle(Vector3.up, mPlayerController.m_GroundNormal);
 		bool flag = num < mPlayerController.m_CharacterController.slopeLimit || num > 85f;
+		
 		mPlayerController.m_MoveDir.x = vector.x * speed;
 		mPlayerController.m_MoveDir.z = vector.z * speed;
+		
 		//Logs.WriteInfo(mPlayerController.m_MoveDir.x + " " + mPlayerController.m_MoveDir.z);
 		if (!flag)
 		{
@@ -352,7 +332,9 @@ internal class VRPlayerController : MonoBehaviour
 		}
 		float magnitude = mPlayerController.m_CharacterController.velocity.magnitude;
 		FootstepTypes footstepType = FootstepTypes.WOOD;
-		Vector3 position = base.transform.position;
+		
+		//Not sure this is right. It used to be base but I think that will be the VRCore or something
+		Vector3 position = mPlayerController.transform.position;
 		position.y += mPlayerController.m_CharacterController.bounds.extents.y - 0.1f;
 		if (Physics.Raycast(position, Vector3.down, out var hitInfo, mPlayerController.m_CharacterController.height + 1f, ~(1 << LayerMask.NameToLayer("Player"))))
 		{

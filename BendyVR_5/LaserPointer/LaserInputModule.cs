@@ -30,7 +30,7 @@ namespace BendyVR_5.LaserPointer;
 
 public class LaserInputModule : BaseInputModule
 {
-    private const float rayDistance = 30f;
+    private const float rayDistance = 20f;
     public Camera EventCamera;
     private Vector3 lastHeadPose;
     private PointerEventData pointerData;

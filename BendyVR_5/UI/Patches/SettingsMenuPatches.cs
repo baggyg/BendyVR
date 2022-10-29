@@ -1,3 +1,4 @@
+using BendyVR_5.Helpers;
 using HarmonyLib;
 using UnityEngine;
 
@@ -5,22 +6,16 @@ using UnityEngine;
 // These patches force some settings to certain values to prevent VR funkyness.
 namespace BendyVR_5.UI.Patches;
 
-/*[HarmonyPatch]
+[HarmonyPatch]
 public class SettingsMenuPatches
 {
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(vgSettingsMenuController), nameof(vgSettingsMenuController.Start))]
-    private static void RemoveUnusedSettingsElements(vgSettingsMenuController __instance)
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(OptionsMenuController), nameof(OptionsMenuController.ShowAdvancedMenu))]
+    private static void RepositionAdvanced(OptionsMenuController __instance)
     {
-        // Rmove control settings screen.
-        __instance.screens.RemoveAt(2);
-
-        // Remove control settings tab.
-        Object.Destroy(__instance.selectionGroup.buttonElements[2].gameObject);
-
-        // Remove one of the tab input prompts.
-        // Since the input prompts have been patched to use VR control names, both of these prompts (left and right)
-        // were saying the same thing (something like "Right Stick"). So we can remove one of them.
-        __instance.selectionGroup.transform.Find("ButtonContainer").GetChild(0).gameObject.SetActive(false);
+        var advanced = GameObject.Find("Visuals/AdvancedMenu");
+        Logs.WriteWarning("Found: " + advanced.name);
+        RectTransform rt = advanced.GetComponent<RectTransform>();
+        rt.position = new Vector3(0f, 150f, -260f);
     }
-}*/
+}

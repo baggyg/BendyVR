@@ -26,6 +26,7 @@ public class VrCore : MonoBehaviour
     private VRPlayerController vrPlayerController;
 
     //private BodyRendererManager bodyRendererManager;
+    public Transform mRoomScaleDamper;
     private Transform mNewCameraParent;
     private VRCameraManager cameraManager;
 
@@ -86,6 +87,15 @@ public class VrCore : MonoBehaviour
         BendyVRPatch.SetStage(instance);        
     }
 
+    public float GetAttackVelocity()
+    {
+        return vrPlayerController.velocityVectorLength;
+    }
+    public float GetAttackAngularVelocity()
+    {
+        return vrPlayerController.angularVelocityVectorLength;
+    }
+
     public void SetUp(Camera camera, PlayerController playerController)
     {
         mainCamera = camera;        
@@ -97,17 +107,51 @@ public class VrCore : MonoBehaviour
         XRSettings.enabled = false;
 
         //Create something above both CameraContainer... Then Move CameraContainer and Camera itself to that. Then FakeParent Camera to CameraContainer
-        //(Since CameraContainer is used for interactions)        
+        //(Since CameraContainer is used for interactions - it actually isn't anymore so don't even know if I need this)
+        
         //Set up a new camera parent
         mNewCameraParent = new GameObject("VrCameraParent").transform;
         //Set it to be below the head container
         mNewCameraParent.SetParent(playerController.HeadContainer, false);
+        GameManager.Instance.GameCamera.transform.SetParent(mNewCameraParent);
+                
         //Set Camera Container to be below new VrCameraParent
         playerController.CameraParent.SetParent(mNewCameraParent);
         //Set the Camera to also be below VrCameraParent
-        GameManager.Instance.GameCamera.transform.SetParent(mNewCameraParent);
+        
+        
         //Move the Camera Container to match the VR Camera (which is auto tracked)
         FakeParenting.Create(playerController.CameraParent, GameManager.Instance.GameCamera.transform, FakeParenting.UpdateType.LateUpdate);
+
+        //RoomScale Mid Tier Dampening
+        mRoomScaleDamper = new GameObject("RoomScaleDamper").transform;
+        Camera newCamera = mRoomScaleDamper.gameObject.AddComponent<Camera>();
+        newCamera.enabled = false;
+        newCamera.clearFlags = CameraClearFlags.Color;
+        newCamera.backgroundColor = Color.black;
+        mRoomScaleDamper.position = playerController.transform.position;
+        //playerController.transform.SetParent(mRoomScaleDamper,false);
+        //playerController.transform.localPosition = new Vector3(0f, 0f, 0f);
+        //playerController.m_HeadContainer.SetParent(mRoomScaleDamper);
+        //playerController.m_HandContainer.SetParent(mRoomScaleDamper);
+        //playerController.transform.localPosition = new Vector3(0f,0f,0f);
+        //playerController.m_HeadContainer.localPosition = new Vector3(0f, 0f, playerController.transform.localPosition.z);
+        //playerController.m_HandContainer.localPosition = new Vector3(0f, 0f, playerController.transform.localPosition.z);
+        //TODO Feet
+
+        //Room Scale - Create a movement buffer above the PlayerController and DeltaTransform that
+        //TODO -> Only do X and Y
+        //mRoomScaleDamper = new GameObject("RoomScaleDamper").transform;
+        //playerController.transform.parent = mRoomScaleDamper;
+
+        //Also Newly Set the Camera to also be below VrCameraParent
+        //GameManager.Instance.GameCamera.transform.SetParent(mRoomScaleDamper);
+
+        //Need to figure out roomscale.... ideally move the playercontroller position to match camera position and headcontainer to be the opposite
+        //FakeParenting.Create(playerController.transform, GameManager.Instance.GameCamera.transform, FakeParenting.UpdateType.LateUpdate, FakeParenting.TransformType.All);
+        //FakeParenting.Create(mRoomScaleDamper, GameManager.Instance.GameCamera.transform, FakeParenting.UpdateType.LateUpdate, FakeParenting.TransformType.DeltaInverseTransformOnly);
+        //FakeParenting.Create(playerController.m_HeadContainer, GameManager.Instance.GameCamera.transform, FakeParenting.UpdateType.LateUpdate, FakeParenting.TransformType.DeltaInverseTransformOnly);
+
 
         //Set Gamecamera planes
         GameManager.Instance.GameCamera.Camera.nearClipPlane = 0.01f;        

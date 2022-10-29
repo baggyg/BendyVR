@@ -59,6 +59,8 @@ public static class VrSettings
     public static ConfigEntry<bool> ControllerBasedMovementDirection { get; private set; }
     public static ConfigEntry<float> WorldScale { get; private set; }
     public static ConfigEntry<float> HeightOffset { get; private set; }
+    public static ConfigEntry<float> VelocityTrigger { get; private set; }
+    public static ConfigEntry<float> AngularVelocityTrigger { get; private set; }
     public static ConfigEntry<SnapTurnAngleOption> SnapTurnAngle { get; private set; }
     public static ConfigEntry<SmoothRotationSpeedOption> SmoothRotationSpeed { get; private set; }
 
@@ -85,10 +87,14 @@ public static class VrSettings
             "Left handed mode.");
         SwapSticks = config.Bind(controlsCategory, "SwapSticks", false,
             "Swap movement / rotation sticks|Swaps controller sticks, independently of handedness.");
-        WorldScale = config.Bind(renderingCategory, "WorldScale", 3.0f,
+        WorldScale = config.Bind(renderingCategory, "WorldScale", 3.5f,
             "World Scale. Increase for World/Objects to look smaller|Decrease for World/Objects to look bigger");
         HeightOffset = config.Bind(renderingCategory, "HeightOffset", 0.0f,
             "Height Offset. Increase to be taller and vice versa");
+        VelocityTrigger = config.Bind(controlsCategory, "VelocityTrigger", 10.0f,
+            "Melee Weapon Velocity Trigger. Increase to require more movement before hit");
+        AngularVelocityTrigger = config.Bind(controlsCategory, "AngularVelocityTrigger", 10.0f,
+            "Melee Weapon Angular Velocity Trigger. Increase to require more movement before hit");
     }
 
     public static string GetSnapTurnAngle()
@@ -132,6 +138,22 @@ public static class VrSettings
             HeightOffset.Value += 0.1f;
         else
             HeightOffset.Value -= 0.1f;
+    }
+
+    public static void UpdateVelocityTrigger(bool higher)
+    {
+        if (higher)
+            VelocityTrigger.Value += 0.1f;
+        else
+            VelocityTrigger.Value -= 0.1f;
+    }
+
+    public static void UpdateAngularVelocityTrigger(bool higher)
+    {
+        if (higher)
+            AngularVelocityTrigger.Value += 1.0f;
+        else
+            AngularVelocityTrigger.Value -= 1.0f;
     }
 
 

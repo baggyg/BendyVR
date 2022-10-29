@@ -16,6 +16,7 @@ public static class VrAssetLoader
     public static GameObject LeftHandPrefab { get; private set; }
     public static GameObject RightHandPrefab { get; private set; }
     public static GameObject TeleportTargetPrefab { get; private set; }
+    public static Sprite MenuBG { get; private set; }
     
 
     public static void LoadAssets()
@@ -28,6 +29,7 @@ public static class VrAssetLoader
         var vrBundle = LoadBundle("vrhands");
         LeftHandPrefab = vrBundle.LoadAsset<GameObject>("vr_glove_left");
         RightHandPrefab = vrBundle.LoadAsset<GameObject>("vr_glove_right");
+        MenuBG = vrBundle.LoadAsset<Sprite>("menu_bg");
 
         var uiBundle = LoadBundle("ui");
         TeleportTargetPrefab = uiBundle.LoadAsset<GameObject>("teleport-target");

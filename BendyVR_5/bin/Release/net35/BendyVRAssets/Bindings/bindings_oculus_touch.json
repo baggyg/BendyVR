@@ -635,7 +635,7 @@
   "controller_type": "oculus_touch",
   "description": "",
   "interaction_profile": "",
-  "name": "Saved Bendy and the Ink Machine configuration for Oculus Touch Controller",
+  "name": "BendyVR configuration for Oculus Touch Controller",
   "options": {},
   "simulated_actions": []
 }
