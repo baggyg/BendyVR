@@ -9,6 +9,7 @@ using InControl;
 using TMG.Controls;
 using TMG.UI.Controls;
 using BendyVR_5.Assets;
+using BendyVR_5.Stage;
 
 namespace BendyVR_5.UI.Patches;
 
@@ -91,15 +92,10 @@ public class MainMenuPatches : BendyVRPatch
         CanvasToWorldSpace.MoveToWorldSpace(__instance, 0.75f);
     }
 
-    /*[HarmonyPostfix]
+    [HarmonyPostfix]
     [HarmonyPatch(typeof(TitleScreenController), nameof(TitleScreenController.InitController))]
-    private static void AddMainMenuBackground(TitleScreenController __instance)
+    private static void MoveStoreButton(TitleScreenController __instance)
     {
-        var background = __instance.transform.Find("Background Layout");
-        background.gameObject.SetActive(true);
-        var image = background.GetComponentInChildren<RawImage>();
-        image.texture = null;
-        image.color = new Color(0, 0, 0, 0.75f);
-        if (image.transform.localPosition.z == 0) image.transform.localPosition += Vector3.forward * 50;
-    }*/
+        __instance.m_StoreBtn.transform.localPosition = new Vector3(-700f, 405f,0f);
+    }
 }

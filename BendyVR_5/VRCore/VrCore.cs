@@ -26,11 +26,10 @@ public class VrCore : MonoBehaviour
     private VRPlayerController vrPlayerController;
 
     //private BodyRendererManager bodyRendererManager;
-    public Transform mRoomScaleDamper;
-    private Transform mNewCameraParent;
     private VRCameraManager cameraManager;
 
     private FadeOverlay fadeOverlay;
+    
     //private Camera fallbackCamera;
     //private FakeParenting follow;
     //private InteractiveUiTarget interactiveUiTarget;
@@ -108,28 +107,9 @@ public class VrCore : MonoBehaviour
 
         //Create something above both CameraContainer... Then Move CameraContainer and Camera itself to that. Then FakeParent Camera to CameraContainer
         //(Since CameraContainer is used for interactions - it actually isn't anymore so don't even know if I need this)
-        
-        //Set up a new camera parent
-        mNewCameraParent = new GameObject("VrCameraParent").transform;
-        //Set it to be below the head container
-        mNewCameraParent.SetParent(playerController.HeadContainer, false);
-        GameManager.Instance.GameCamera.transform.SetParent(mNewCameraParent);
-                
-        //Set Camera Container to be below new VrCameraParent
-        playerController.CameraParent.SetParent(mNewCameraParent);
-        //Set the Camera to also be below VrCameraParent
-        
-        
-        //Move the Camera Container to match the VR Camera (which is auto tracked)
-        FakeParenting.Create(playerController.CameraParent, GameManager.Instance.GameCamera.transform, FakeParenting.UpdateType.LateUpdate);
 
-        //RoomScale Mid Tier Dampening
-        mRoomScaleDamper = new GameObject("RoomScaleDamper").transform;
-        Camera newCamera = mRoomScaleDamper.gameObject.AddComponent<Camera>();
-        newCamera.enabled = false;
-        newCamera.clearFlags = CameraClearFlags.Color;
-        newCamera.backgroundColor = Color.black;
-        mRoomScaleDamper.position = playerController.transform.position;
+        
+
         //playerController.transform.SetParent(mRoomScaleDamper,false);
         //playerController.transform.localPosition = new Vector3(0f, 0f, 0f);
         //playerController.m_HeadContainer.SetParent(mRoomScaleDamper);
@@ -192,8 +172,15 @@ public class VrCore : MonoBehaviour
     {
         float scale = VrSettings.WorldScale.Value;
         //GameManager.Instance.GameCamera.transform.localScale = new Vector3(scale, scale, scale);
-        mNewCameraParent.localScale = new Vector3(scale, scale, scale);
-        GameManager.Instance.Player.m_HandContainer.localScale = new Vector3(scale, scale, scale);
+        if (vrPlayerController.mNewCameraParent)
+            vrPlayerController.mNewCameraParent.localScale = new Vector3(scale, scale, scale);
+        else
+            Logs.WriteError("mNewCameraParent does not exist! (UpdateWorldScale)");
+
+        if(GameManager.Instance.Player.m_HandContainer)
+            GameManager.Instance.Player.m_HandContainer.localScale = new Vector3(scale, scale, scale);
+        else
+            Logs.WriteError("m_HandContainer does not exist! (UpdateWorldScale)");
     }
 
     private void ResetHeight()
@@ -202,16 +189,16 @@ public class VrCore : MonoBehaviour
         float offset = (-1.5f * scale) + 0.7f;
         offset += VrSettings.HeightOffset.Value;
         
-        mNewCameraParent.localPosition = new Vector3(0, offset, 0);
+        vrPlayerController.mNewCameraParent.localPosition = new Vector3(0, offset, 0);
 
         GameManager.Instance.Player.m_HandContainer.localPosition = new Vector3(0, 0, 0);
         //Measure the difference between VRCameraParent and Hand Container (Absolute) -> Thats the new Hand Container offset - Don't ask me to explain it
-        float handContainerOffset = mNewCameraParent.position.y - GameManager.Instance.Player.m_HandContainer.position.y;
+        float handContainerOffset = vrPlayerController.mNewCameraParent.position.y - GameManager.Instance.Player.m_HandContainer.position.y;
         GameManager.Instance.Player.m_HandContainer.localPosition = new Vector3(0, handContainerOffset, 0);
         
         Logs.WriteInfo("Scale = " + scale);
         Logs.WriteInfo("Hand Offset = " + handContainerOffset);
-        Logs.WriteInfo("VrCameraParent Y = " + mNewCameraParent.localPosition.y);
+        Logs.WriteInfo("VrCameraParent Y = " + vrPlayerController.mNewCameraParent.localPosition.y);
     }
 
     private void Update()

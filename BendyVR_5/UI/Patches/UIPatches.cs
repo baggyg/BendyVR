@@ -6,7 +6,7 @@ using BendyVR_5.Assets;
 using BendyVR_5.Helpers;
 using UnityEngine;
 using UnityEngine.UI;
-using Object = UnityEngine.Object;
+using TMG.UI;
 
 namespace BendyVR_5.UI.Patches;
 
@@ -14,6 +14,68 @@ namespace BendyVR_5.UI.Patches;
 public class UIPatches : BendyVRPatch
 {
     private static readonly Dictionary<string, Material> materialMap = new();
+    
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(BaseUIController), nameof(BaseUIController.InitController))]
+    private static void UniformResizeHUD(BaseUIController __instance)
+    {
+        //__instance.gameObject.GetComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+        __instance.gameObject.GetComponent<CanvasScaler>().enabled = false;
+        __instance.rectTransform.sizeDelta = new Vector2(2408, 2428);
+    }
+
+    /*[HarmonyPrefix]
+    [HarmonyPatch(typeof(CanvasScaler), nameof(CanvasScaler.Start))]
+    private static void SetConstantSize(CanvasScaler __instance)
+    {
+        __instance.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+    }*/
+
+    //On higher World Scales the projections weren't showing. God knows why but this fixes it. 
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Decal), nameof(Decal.UpdateProjectionClipping))]    
+    private static bool IncreaseDecalProjections(Decal __instance)
+    {
+        float value = Mathf.Cos((float)Math.PI / 180f * 180f);
+        __instance.materialProperties.SetFloat(__instance._NormalCutoff, value);
+        return false;
+    }
+
+    //Reposition the Audio Logs to be readable
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(AudioLogModalController), nameof(AudioLogModalController.InitController))]
+    private static void RepositionAudioLogs(AudioLogModalController __instance)
+    {
+        Logs.WriteInfo("Repositioning Audio Logs");
+        __instance.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+        __instance.transform.localPosition = new Vector3(500f, -800f, 0f);
+    }
+
+    //Reposition the Objectives to be readable
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ObjectivesController), nameof(ObjectivesController.InitController))]
+    private static void RepositionObjectives(ObjectivesController __instance)
+    {
+        Logs.WriteInfo("Repositioning Objectives");
+        __instance.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
+        __instance.transform.localPosition = new Vector3(1120f, 900f, 0f);
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(HurtBordersController), nameof(HurtBordersController.InitController))]
+    private static void RepositionHurt(HurtBordersController __instance)
+    {
+        Logs.WriteInfo("Repositioning Hurt");
+        __instance.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(MainSubtitlesController), nameof(MainSubtitlesController.InitController))]
+    private static void RepositionSubtitles(MainSubtitlesController __instance)
+    {
+        Logs.WriteInfo("Repositioning Subtitles");
+        __instance.transform.localPosition = new Vector3(__instance.transform.localPosition.x, 300f, __instance.transform.localPosition.z);
+    }
 
     /*[HarmonyPrefix]
     [HarmonyPatch(typeof(vgHudManager), nameof(vgHudManager.ShowAbilityIcon))]
@@ -33,7 +95,7 @@ public class UIPatches : BendyVRPatch
     // For some reason, the default text shader draws on top of everything.
     // I'm importing the TMPro shader from a more recent version and replacing it in the font materials.
     // This way, I can decide which ones I actually want to draw on top.
-    [HarmonyPostfix]
+    /*[HarmonyPostfix]
     [HarmonyPatch(typeof(TextMeshProUGUI), nameof(TextMeshProUGUI.Awake))]
     [HarmonyPatch(typeof(TextMeshProUGUI), nameof(TextMeshProUGUI.OnEnable))]
     private static void PreventTextFromDrawingOnTop(TextMeshProUGUI __instance)
@@ -66,7 +128,7 @@ public class UIPatches : BendyVRPatch
         {
             Logs.WriteWarning($"Error in TMPro Patch ({__instance.name}): {exception}");
         }
-    }
+    }*/
 
     /*[HarmonyPostfix]
     [HarmonyPatch(typeof(vgHudManager), nameof(vgHudManager.Awake))]

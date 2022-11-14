@@ -1,32 +1,21 @@
 using HarmonyLib;
 using BendyVR_5.Helpers;
 using UnityEngine;
+using TMG.Controls;
+using BendyVR_5.Stage;
 
 namespace BendyVR_5.UI.Patches;
 
 [HarmonyPatch]
 public static class PauseMenuPatches
 {
-    /*[HarmonyPostfix]
-    [HarmonyPatch(typeof(vgHudManager), nameof(vgHudManager.Awake))]
-    private static void RemoveQuitToMenuButton(vgHudManager __instance)
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(GameMenuController), nameof(GameMenuController.Quit))]
+    private static void NotifyQuit(GameMenuController __instance)
     {
-        var quitToMenu =
-            __instance.pauseRoot.transform.Find("SafeZoner/Settings Menu Group/Quit Button");
-
-        if (quitToMenu == null)
-        {
-            Logs.WriteWarning("Failed to find quit to menu button");
-            return;
-        }
-
-        Object.Destroy(quitToMenu.gameObject);
+        //VrCore.instance.quitTriggered = true;
+        //TODO - What the hell is this doing? Need to debug the whole thing
     }
 
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(vgScrimManager), nameof(vgScrimManager.ShowScrim))]
-    private static void DisablePauseBlur(ref bool blur)
-    {
-        blur = false;
-    }*/
+		
 }

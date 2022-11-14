@@ -12,15 +12,21 @@ using System.Linq;
 using System.Text;
 using TMG.Controls;
 using UnityEngine;
+using UnityEngine.XR;
 
 namespace BendyVR_5.Player;
 
 internal class VRPlayerController : MonoBehaviour
 {
-    private PlayerController mPlayerController;
+    public PlayerController mPlayerController;
     private VrCore coreVR;
-	private Transform mDominantHand;
-	private Transform mNonDominantHand;
+	public Transform mDominantHand;
+	public Transform mNonDominantHand;
+	public Transform mRoomScaleDamper;
+	Vector3 oldPosition = Vector3.zero;
+	float oldRotation = 0f;
+	public Transform mNewCameraParent;
+	private FakeParenting mFollowCameraParent;
 	public VrLaser mLaser;
 	bool enabled = false;
 	bool hasAxe = false;
@@ -47,14 +53,40 @@ internal class VRPlayerController : MonoBehaviour
 	{
 		mPlayerController = _playerController;
 
+		//Turn down the radius of character controller so wall pushback isn't such a problem
+		CharacterController cc = mPlayerController.GetComponent<CharacterController>();
+		cc.radius = 0.5f;
+
+		//Set up a new camera parent
+		mNewCameraParent = new GameObject("RoomScaleDamper").transform;
+		//Set it to be below the head container
+		mNewCameraParent.localPosition = Vector3.zero;
+		mNewCameraParent.localRotation = Quaternion.identity;
+		mNewCameraParent.SetParent(mPlayerController.HeadContainer, false);
+
+		//RoomScale Mid Tier Dampening
+		SetupCameraHierarchy();
+		SetupCameraFollow();
+
+		//TODO This assume dominant is always right
 		//Add the prefabs to the hands
-		mNonDominantHand = Instantiate(VrAssetLoader.LeftHandPrefab).transform;
+		if (VrSettings.LeftHandedMode.Value == true)
+		{
+			mNonDominantHand = Instantiate(VrAssetLoader.RightHandPrefab).transform;
+			mDominantHand = Instantiate(VrAssetLoader.LeftHandPrefab).transform;
+		}
+		else
+        {
+			mNonDominantHand = Instantiate(VrAssetLoader.LeftHandPrefab).transform;
+			mDominantHand = Instantiate(VrAssetLoader.RightHandPrefab).transform;
+		}
+
 		mNonDominantHand.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
 		LayerHelper.SetLayerRecursive(transform.gameObject, GameLayer.VrHands);
 		mNonDominantHand.name = "NonDominantVRHand";
 		mNonDominantHand.parent = mPlayerController.m_HandContainer;
 
-		mDominantHand = Instantiate(VrAssetLoader.RightHandPrefab).transform;
+		
 		mDominantHand.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
 		LayerHelper.SetLayerRecursive(transform.gameObject, GameLayer.VrHands);
 		mDominantHand.name = "DominantVRHand";
@@ -64,14 +96,47 @@ internal class VRPlayerController : MonoBehaviour
 		//Move the hand below the tracked hand and scale correctly
 		Transform hand = mPlayerController.m_HandContainer.Find("Hand");
 		hand.parent = mDominantHand;
-		hand.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
-        hand.eulerAngles = new Vector3(90f, 0.0f, 0.0f);
+		hand.localPosition = Vector3.zero;
+        hand.eulerAngles = Vector3.zero;
 		hand.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+
+		//GB This didn't quite work as the HeadContainer was well off from the rest, which is used for events etc
+		//RoomScale Mid Tier Dampening
+		/*mRoomScaleDamper = new GameObject("RoomScaleDamper").transform;
+		mRoomScaleDamper.localPosition = Vector3.zero;
+		mRoomScaleDamper.localRotation = Quaternion.identity;
+		mRoomScaleDamper.SetParent(mPlayerController.transform, false);
+		mPlayerController.m_HandContainer.SetParent(mRoomScaleDamper);
+		mPlayerController.m_HeadContainer.SetParent(mRoomScaleDamper);*/
+
+
 
 		//Removed this as I think I meant Hand, not handcontainer
 		//mPlayerController.m_HandContainer.localPosition = new Vector3(0.0f, 0.0f, 0.0f);
 
 		enabled = true;
+	}
+
+	//Generally this needs to happen when something else has taken control
+	public void SetupCameraHierarchy()
+	{
+		//Set Camera Container to be below new VrCameraParent
+		mPlayerController.CameraParent.SetParent(mNewCameraParent);
+
+		//Set the Camera to also be below VrCameraParent
+		GameManager.Instance.GameCamera.transform.SetParent(mNewCameraParent);
+	}
+
+	public void SetupCameraFollow()
+	{
+		//Move the Camera Container to match the VR Camera (which is auto tracked)
+		mFollowCameraParent = FakeParenting.Create(mPlayerController.CameraParent, GameManager.Instance.GameCamera.transform, FakeParenting.UpdateType.LateUpdate);
+	}
+
+	public void RemoveCameraFollow()
+	{
+		//Move the Camera Container to match the VR Camera (which is auto tracked)
+		UnityEngine.Object.Destroy(mFollowCameraParent);
 	}
 
 	public void SetupAxe()
@@ -94,12 +159,32 @@ internal class VRPlayerController : MonoBehaviour
 		_anim.enabled = false;
 
 		//Set Up Axe Local Position
-		Transform axe = hand.Find("WeaponAnimator/Weapon_Axe");
-		axe.localPosition = new Vector3(0f, -.2f, 0f);
+		Transform animator = hand.Find("WeaponAnimator");
+		animator.localPosition = Vector3.zero;
+		animator.localRotation = Quaternion.identity;
+
+		Transform weapon_axe = animator.Find("Weapon_Axe");
+		weapon_axe.localPosition = Vector3.zero;
+		weapon_axe.localEulerAngles = new Vector3(0f, 350f, 0f); 
+
+		Transform axe = weapon_axe.Find("Axe");
+		axe.localPosition = Vector3.zero;
+		axe.localRotation = Quaternion.identity;
+		//axe.localPosition = new Vector3(0f, -.2f, 0f);
+
 
 		//Turn Off Glove
 		TurnOffDominantHand();
 		hasAxe = true;
+	}
+
+	public void LoseAxe()
+	{
+		Logs.WriteInfo("LoseAxe");
+
+		//Turn On Glove
+		TurnOnDominantHand();
+		hasAxe = false;
 	}
 
 	public void TurnOffDominantHand()
@@ -107,6 +192,47 @@ internal class VRPlayerController : MonoBehaviour
 		Transform gloveRenderMesh = mDominantHand.Find("vr_glove_model/renderMesh0");
 		gloveRenderMesh.GetComponent<SkinnedMeshRenderer>().enabled = false;
 	}
+
+	public void TurnOnDominantHand()
+	{
+		Transform gloveRenderMesh = mDominantHand.Find("vr_glove_model/renderMesh0");
+		gloveRenderMesh.GetComponent<SkinnedMeshRenderer>().enabled = true;
+	}
+
+	List<XRNodeState> nodeStatesCache = new List<XRNodeState>();
+	bool TryGetCenterEyeNodeStateRotation(out Quaternion rotation)
+	{
+		InputTracking.GetNodeStates(nodeStatesCache);
+		for (int i = 0; i < nodeStatesCache.Count; i++)
+		{
+			XRNodeState nodeState = nodeStatesCache[i];
+			if (nodeState.nodeType == XRNode.CenterEye)
+			{
+				if (nodeState.TryGetRotation(out rotation))
+					return true;
+			}
+		}
+		// This is the fail case, where there was no center eye was available.
+		rotation = Quaternion.identity;
+		return false;
+	}
+	bool TryGetCenterEyeNodeStatePosition(out Vector3 position)
+	{
+		InputTracking.GetNodeStates(nodeStatesCache);
+		for (int i = 0; i < nodeStatesCache.Count; i++)
+		{
+			XRNodeState nodeState = nodeStatesCache[i];
+			if (nodeState.nodeType == XRNode.CenterEye)
+			{
+				if (nodeState.TryGetPosition(out position))
+					return true;
+			}
+		}
+		// This is the fail case, where there was no center eye was available.
+		position = new Vector3();
+		return false;
+	}
+
 
 	private void Update()
 	{
@@ -126,6 +252,7 @@ internal class VRPlayerController : MonoBehaviour
 		}
 		else if (!GameManager.Instance.isPaused)
 		{
+			//Jump
 			mPlayerController.m_PlayerLook.GetInput();
 			if (mPlayerController.m_CharacterController.isGrounded && !mPlayerController.m_JumpInput && mPlayerController.m_EnableJump && mPlayerController.canJump && !mPlayerController.isLocked && !mPlayerController.isMoveLocked)
 			{
@@ -141,6 +268,7 @@ internal class VRPlayerController : MonoBehaviour
 				mPlayerController.UseSeeingTool(mPlayerController.isSeeingToolActive);
 			}
 
+			//Velocity Based Attacks
 			if (hasAxe)
 			{
 				//Velocity Delta
@@ -149,13 +277,39 @@ internal class VRPlayerController : MonoBehaviour
 				velocityVectorLength = velocity.sqrMagnitude;
 
 				//Angular Velocity
-				Quaternion deltaRotation = mDominantHand.localRotation * Quaternion.Inverse(lastRotation);
+				Quaternion deltaAxeRotation = mDominantHand.localRotation * Quaternion.Inverse(lastRotation);
 				lastRotation = mDominantHand.localRotation;
-				deltaRotation.ToAngleAxis(out var angle, out var axis);
+				deltaAxeRotation.ToAngleAxis(out var angle, out var axis);
 				angle *= Mathf.Deg2Rad;
 				Vector3 angularVelocity = (1.0f / Time.deltaTime) * angle * axis;
 				angularVelocityVectorLength = angularVelocity.magnitude;				
 			}
+
+			//Move Room Dampener (Defi X and Z)
+			Vector3 newPosition = GameManager.Instance.GameCamera.transform.localPosition;
+			Vector3 deltaPosition = newPosition - oldPosition;
+			float newRotation = GameManager.Instance.GameCamera.transform.localRotation.eulerAngles.y;
+			float deltaRotation = newRotation - oldRotation;
+
+			if (!mPlayerController.isMoveLocked)
+			{
+				mRoomScaleDamper.transform.localPosition = new Vector3(-newPosition.x, 0f, -newPosition.z) * VrSettings.WorldScale.Value;
+				if (!oldPosition.Equals(Vector3.zero))
+				{
+					//TODO - see if moving the playercontrollers rotation helps with anything. 
+					//mPlayerController.transform.eulerAngles = new Vector3(mPlayerController.transform.eulerAngles.x, mPlayerController.transform.eulerAngles.y + deltaRotation, mPlayerController.transform.eulerAngles.z);
+
+					//Vector3 movePlayer = new Vector3(mPlayerController.transform.localPosition.x - deltaPosition.x, mPlayerController.transform.localPosition.y, mPlayerController.transform.localPosition.z - deltaPosition.z);
+					Vector3 movePlayer = new Vector3(-deltaPosition.x, 0f, -deltaPosition.z) * VrSettings.WorldScale.Value;
+					movePlayer = mPlayerController.transform.rotation * movePlayer;
+					mPlayerController.transform.localPosition = new Vector3(mPlayerController.transform.localPosition.x - movePlayer.x, mPlayerController.transform.localPosition.y, mPlayerController.transform.localPosition.z - movePlayer.z); ;
+
+					//Vector3 camDiff = mPlayerController.transform.position - GameManager.Instance.GameCamera.transform.position;
+					//Logs.WriteInfo("PC -> Cam Difference: " + camDiff.x + " " + camDiff.y + " " + camDiff.z);
+				}
+			}
+			oldPosition = newPosition;
+			oldRotation = newRotation;
 		}
 	}
 
@@ -260,6 +414,12 @@ internal class VRPlayerController : MonoBehaviour
 			ActionInputDefinitions.RotateX.AxisValue * smoothRotationBaseSpeed *
 			(int)VrSettings.SmoothRotationSpeed.Value *
 			Time.unscaledDeltaTime);
+		/*mPlayerController.transform.RotateAround(
+			GameManager.Instance.GameCamera.transform.position, 
+			Vector3.up,
+			ActionInputDefinitions.RotateX.AxisValue * smoothRotationBaseSpeed * 
+			(int)VrSettings.SmoothRotationSpeed.Value *
+			Time.unscaledDeltaTime);*/
 	}
 
 	private void SnapTurnLeft()
@@ -274,8 +434,9 @@ internal class VRPlayerController : MonoBehaviour
 
 	private void SnapTurn(float angle)
 	{
-		Logs.WriteInfo("Snap Turning " + angle.ToString());
+		//Logs.WriteInfo("Snap Turning " + angle.ToString());
 		mPlayerController.transform.Rotate(Vector3.up, angle);
+		//mPlayerController.transform.RotateAround(GameManager.Instance.GameCamera.transform.position, Vector3.up, angle);
 		Invoke(nameof(EndSnap), FadeOverlay.Duration);
 	}
 
@@ -291,9 +452,9 @@ internal class VRPlayerController : MonoBehaviour
 		//TODO Change to be the dominant hand if that setting is set
 		Vector3 vector;
 		if (VrSettings.ControllerBasedMovementDirection.Value == true)
-			vector = mNonDominantHand.forward * mPlayerController.m_Input.y + mPlayerController.transform.right * mPlayerController.m_Input.x;
+			vector = mNonDominantHand.forward * mPlayerController.m_Input.y + mNonDominantHand.right * mPlayerController.m_Input.x;
 		else
-			vector = GameManager.Instance.GameCamera.transform.forward * mPlayerController.m_Input.y + mPlayerController.transform.right * mPlayerController.m_Input.x;
+			vector = GameManager.Instance.GameCamera.transform.forward * mPlayerController.m_Input.y + GameManager.Instance.GameCamera.transform.right * mPlayerController.m_Input.x;
 
 		//vector = mPlayerController.transform.forward * mPlayerController.m_Input.y + mPlayerController.transform.right * mPlayerController.m_Input.x;
 		float num = Vector3.Angle(Vector3.up, mPlayerController.m_GroundNormal);

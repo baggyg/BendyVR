@@ -38,7 +38,7 @@ public class GameSettingsPatches
         __instance.CreateOption(ref __instance.m_AdvancedMenuOptions, __instance.m_AdvancedMenuParent, "Left Handed Mode", !VrSettings.LeftHandedMode.Value ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
         __instance.CreateOption(ref __instance.m_AdvancedMenuOptions, __instance.m_AdvancedMenuParent, "Swap Sticks", !VrSettings.SwapSticks.Value ? "MENU/SETTINGS_OFF" : "MENU/SETTINGS_ON");
         __instance.CreateOption(ref __instance.m_AdvancedMenuOptions, __instance.m_AdvancedMenuParent, "World Scale", VrSettings.WorldScale.Value.ToString());
-        __instance.CreateOption(ref __instance.m_AdvancedMenuOptions, __instance.m_AdvancedMenuParent, "HeightOffset", VrSettings.HeightOffset.Value.ToString());
+        __instance.CreateOption(ref __instance.m_AdvancedMenuOptions, __instance.m_AdvancedMenuParent, "HeightOffset", (Mathf.Round(VrSettings.HeightOffset.Value * 10.0f) * 0.1f).ToString());
         __instance.CreateOption(ref __instance.m_AdvancedMenuOptions, __instance.m_AdvancedMenuParent, "velocityTrigger", (Mathf.Round(VrSettings.VelocityTrigger.Value * 10.0f) * 0.1f).ToString());
         __instance.CreateOption(ref __instance.m_AdvancedMenuOptions, __instance.m_AdvancedMenuParent, "angularVelocityTrigger", (Mathf.Round(VrSettings.AngularVelocityTrigger.Value * 10.0f) * 0.1f).ToString());
 
@@ -117,7 +117,7 @@ public class GameSettingsPatches
                 Logs.WriteInfo("HeightOffset is now " + VrSettings.HeightOffset.Value.ToString());
                 VrSettings.UpdateHeightOffset(isRight);
                 Logs.WriteInfo("HeightOffset is now " + VrSettings.HeightOffset.Value.ToString());
-                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue(VrSettings.HeightOffset.Value.ToString());
+                __instance.m_AdvancedMenuOptions[__instance.m_SelectedIndex].UpdateValue((Mathf.Round(VrSettings.HeightOffset.Value * 10.0f) * 0.1f).ToString());
                 break;
             case 8:
                 Logs.WriteInfo("VelocityTrigger is now " + VrSettings.VelocityTrigger.Value.ToString());

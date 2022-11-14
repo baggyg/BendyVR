@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 2812348116
+CRC: 2184386133
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: f5b29fe90de08b8f0f2c693d44c1fe80
+    Hash: 66ee6daa2f884201f61bc4f95269c985
   TypeTreeHash:
     serializedVersion: 2
     Hash: ce28056b625f1caf531d104f6545413d
@@ -44,5 +44,5 @@ ClassTypes:
 Assets:
 - Assets/AssetBundles/VRHands/vr_glove_left.prefab
 - Assets/AssetBundles/VRHands/vr_glove_right.prefab
-- Assets/AssetBundles/VRHands/menu_bg.png
+- Assets/AssetBundles/VRHands/menu_bg.jpg
 Dependencies: []

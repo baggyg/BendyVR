@@ -16,14 +16,57 @@ namespace BendyVR_5.Player.Patches;
 public class HoldableItemPatches : BendyVRPatch
 {
 	[HarmonyPostfix]
-	[HarmonyPatch(typeof(CH1FinaleController), nameof(CH1FinaleController.HandleAxeOnEquipped))]
-	//[HarmonyPatch(typeof(CH4BertrumController), nameof(CH4BertrumController.HandleAxeOnEquipped))]
-	private static void PrepareAxe(CH1FinaleController __instance)
+	//[HarmonyPatch(typeof(CH1FinaleController), nameof(CH1FinaleController.HandleAxeOnEquipped))]
+    [HarmonyPatch(typeof(MeleeWeapon), nameof(MeleeWeapon.OnEquip))]
+    //[HarmonyPatch(typeof(CH4BertrumController), nameof(CH4BertrumController.HandleAxeOnEquipped))]
+	private static void PrepareAxe(MeleeWeapon __instance)
 	{
-		//GB - May need to change this to the specific HandleAxeOnEquipped calls whenever they occur
-		VRPlayerController vrPlayerController = VrCore.instance.GetVRPlayerController();
+        //GB - May need to change this to the specific HandleAxeOnEquipped calls whenever they occur
+        VRPlayerController vrPlayerController = VrCore.instance.GetVRPlayerController();
+
+        //Poss Fix - Make sure this is the child of hand (not sure why its not here)
+        Logs.WriteWarning("Preparing Axe " + __instance.transform.name);
+        Logs.WriteWarning("Parent is " + __instance.transform.parent.name);
+        
+        //Set Up Axe Local Position
+        __instance.transform.SetParent(GameManager.Instance.Player.WeaponParent);
+        
 		vrPlayerController.SetupAxe();		
 	}
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.UnEquipWeapon))]    
+    private static void LoseAxe(PlayerController __instance)
+    {
+        VRPlayerController vrPlayerController = VrCore.instance.GetVRPlayerController();
+        vrPlayerController.LoseAxe();
+    }
+
+
+
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(CH2RitualRoomController), nameof(CH2RitualRoomController.ForceComplete))]
+    private static bool VRCH2RitualRoomControllerComplete(CH2RitualRoomController __instance)
+    {
+        GameManager.Instance.UpdateObjective(ObjectiveDataVO.Create("OBJECTIVES/CURRENT_OBJECTIVE_HEADER", "OBJECTIVES/OBJECTIVE_FIND_A_NEW_EXIT", string.Empty));
+        GameManager.Instance.Player.WeaponGameObject = __instance.m_Axe.gameObject;
+        GameManager.Instance.Player.EquipWeapon();
+        if ((bool)__instance.m_Axe && __instance.m_Axe.Interaction != null)
+        {
+            __instance.m_Axe.Interaction.SetActive(active: false);
+        }
+        __instance.m_Axe.KillInteraction();
+        __instance.m_Axe.Equip();
+
+        __instance.m_Plank.gameObject.SetActive(value: false);
+        __instance.m_ScarePlank.gameObject.SetActive(value: false);
+        __instance.m_Door.ForceOpen(145f);
+        __instance.m_Door.Lock();
+        __instance.SendOnComplete();
+
+        return false;
+    }
 
 
 
@@ -106,21 +149,21 @@ public class HoldableItemPatches : BendyVRPatch
         if (__instance.m_CanAttack && __instance.m_IsEquipped && !GameManager.Instance.Player.isLocked && !GameManager.Instance.isPaused && 
             (VrCore.instance.GetAttackVelocity() >= VrSettings.VelocityTrigger.Value || VrCore.instance.GetAttackAngularVelocity() >= VrSettings.AngularVelocityTrigger.Value))
         {
-            if(VrCore.instance.GetAttackVelocity() >= VrSettings.VelocityTrigger.Value)
+            /*if(VrCore.instance.GetAttackVelocity() >= VrSettings.VelocityTrigger.Value)
             {
                 Logs.WriteInfo("Velocity Attack: " + VrCore.instance.GetAttackVelocity());
             }
             else if(VrCore.instance.GetAttackAngularVelocity() >= VrSettings.AngularVelocityTrigger.Value)
             {
                 Logs.WriteInfo("Angular Attack: " + VrCore.instance.GetAttackAngularVelocity());
-            }               
+            } */              
             __instance.m_CanAttack = false;
             __instance.OnAttack();
         }
-        else if(!__instance.m_CanAttack && (VrCore.instance.GetAttackVelocity() >= VrSettings.VelocityTrigger.Value || VrCore.instance.GetAttackAngularVelocity() >= VrSettings.AngularVelocityTrigger.Value))
+        /*else if(!__instance.m_CanAttack && (VrCore.instance.GetAttackVelocity() >= VrSettings.VelocityTrigger.Value || VrCore.instance.GetAttackAngularVelocity() >= VrSettings.AngularVelocityTrigger.Value))
         {
             Logs.WriteInfo("Can't Attack!");
-        }
+        }*/
         /*else if (__instance.m_IsEquipped && !GameManager.Instance.Player.isLocked && !GameManager.Instance.isPaused &&
             VrCore.instance.GetAttackVelocity() < VrSettings.VelocityTrigger.Value && 
             VrCore.instance.GetAttackAngularVelocity() < VrSettings.AngularVelocityTrigger.Value)
