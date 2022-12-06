@@ -2,6 +2,7 @@
 using BendyVR_5.Stage;
 using DG.Tweening;
 using HarmonyLib;
+using S13Audio;
 using UnityEngine;
 using UnityEngine.PostProcessing;
 
@@ -37,6 +38,7 @@ public class GameCameraPatches : BendyVRPatch
         GameManager.Instance.Player.EnableSeeingTool(active: true);
 
         vrCore.GetVRPlayerController().SetupCameraFollow();
+        VrCore.instance.GetVRPlayerController().inFreeRoam = false;
         return false;
     }
 
@@ -60,7 +62,98 @@ public class GameCameraPatches : BendyVRPatch
         GameManager.Instance.GameCamera.CameraContainer.localScale = Vector3.one;
         
         __result = freeRoamCam;
+        VrCore.instance.GetVRPlayerController().inFreeRoam = true;
         return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(LittleMiracleStationController), nameof(LittleMiracleStationController.HandleDoorInteractableOnInteracted))]
+    private static bool MiracleStationEntry(LittleMiracleStationController __instance)
+    {
+        Logs.WriteWarning("INITIALISING MIRACLE STATION");
+        __instance.m_DoorInteractable.OnInteracted -= __instance.HandleDoorInteractableOnInteracted;
+        GameManager.Instance.CurrentChapter.DeathController.OnDeath += __instance.HandlePlayerOnDeath;
+        GameManager.Instance.CurrentChapter.DeathController.OnSpawned += __instance.HandlePlayerOnSpawned;
+        __instance.m_Player = GameManager.Instance.Player;
+        __instance.m_Player.SetLockedMovement(active: true);
+        __instance.m_Player.SetCollision(active: false);
+        GameManager.Instance.HideCrosshair();
+        
+        Transform freeRoamCam = GameManager.Instance.GameCamera.FreeRoamCam;
+        freeRoamCam.position = GameManager.Instance.GameCamera.CameraContainer.position;
+        freeRoamCam.rotation = GameManager.Instance.GameCamera.CameraContainer.rotation;
+
+        //Check we don't already have the offset (so we don't create one million 543 thousand game objects)
+        Transform cameraOffset = freeRoamCam.Find("MiracleCameraOffset");
+        if(cameraOffset == null)
+            cameraOffset = new GameObject("MiracleCameraOffset").transform;
+        cameraOffset.SetParent(freeRoamCam);
+        cameraOffset.localRotation = Quaternion.identity;
+        //cameraOffset.localPosition = new Vector3(0f,-GameManager.Instance.GameCamera.Camera.transform.localPosition.y, 0f);
+        cameraOffset.localPosition = -GameManager.Instance.GameCamera.Camera.transform.localPosition;
+
+        GameManager.Instance.GameCamera.CameraContainer.SetParent(freeRoamCam);
+        GameManager.Instance.GameCamera.CameraContainer.localScale = Vector3.one;
+        GameManager.Instance.GameCamera.Camera.transform.SetParent(cameraOffset);
+        VrCore.instance.GetVRPlayerController().inFreeRoam = true;
+        VrCore.instance.GetVRPlayerController().mDominantHand.SetParent(cameraOffset);
+        VrCore.instance.GetVRPlayerController().mNonDominantHand.SetParent(cameraOffset);
+
+        //Removing Follow
+        VrCore.instance.GetVRPlayerController().RemoveCameraFollow();
+        GameManager.Instance.ShowScreenBlocker(0.3f);
+        Sequence sequence = DOTween.Sequence();
+        float num = 0f;        
+        if (GameManager.Instance.Player.WeaponGameObject != null)
+        {
+            sequence.Insert(num, GameManager.Instance.Player.WeaponGameObject.transform.DOLocalMoveY(-5f, 0.25f).SetEase(Ease.InQuad));
+            sequence.Insert(num, GameManager.Instance.Player.WeaponGameObject.transform.DOLocalRotate(new Vector3(180f, 0f, 0f), 0.2f, RotateMode.LocalAxisAdd).SetEase(Ease.InQuad));
+            sequence.InsertCallback(num + 0.25f, delegate
+            {
+                GameManager.Instance.Player.WeaponGameObject.SetActive(value: false);
+                GameManager.Instance.Player.UnEquipWeapon();
+            });
+        }
+        num += 0.25f;
+        sequence.Insert(num, freeRoamCam.DOMove(__instance.m_BackupPosition.position, 0.4f).SetEase(Ease.InOutQuad));
+        sequence.Insert(num, freeRoamCam.DORotate(__instance.m_BackupPosition.eulerAngles, 0.4f).SetEase(Ease.InOutQuad));
+        num += 0.4f;
+        sequence.Insert(num, __instance.m_Door.DOLocalRotate(new Vector3(0f, 90f, 0f), 0.8f).SetEase(Ease.InOutQuad));
+        S13AudioManager.Instance.InvokeEvent("evt_miracle_station_enter");
+        num += 0.5f;
+        sequence.Insert(num, freeRoamCam.DOMove(__instance.m_CameraLook.position, 0.65f).SetEase(Ease.InOutQuad));
+        sequence.Insert(num, freeRoamCam.DORotate(__instance.m_CameraLook.eulerAngles, 0.7f).SetEase(Ease.InOutQuad));
+        num += 0.25f;
+        sequence.Insert(num, __instance.m_Door.DOLocalRotate(Vector3.zero, 0.7f).SetEase(Ease.InOutQuad));
+        sequence.OnComplete(__instance.HandleEntranceOnComplete);
+        //__instance.OnInteract.Send(__instance);
+        return false;
+    }
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(LittleMiracleStationController), nameof(LittleMiracleStationController.HandleEntranceOnComplete))]
+    private static void TurnOffHands()
+    {
+        //GB New also need to move the camera there (and the hands)        
+        Logs.WriteWarning("Turning Off Both hands");
+        VrCore.instance.GetVRPlayerController().TurnOffBothHands();
+        GameManager.Instance.HideScreenBlocker(0f);
+    }
+
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(LittleMiracleStationController), nameof(LittleMiracleStationController.HandleExitOnComplete))]
+    private static void MiracleStationExit(LittleMiracleStationController __instance)
+    {
+        Logs.WriteWarning("EXITING MIRACLE STATION");
+        VrCore vrCore = VrCore.instance;
+        vrCore.GetVRPlayerController().SetupCameraHierarchy();
+        vrCore.GetVRPlayerController().SetupCameraFollow();
+        vrCore.GetVRPlayerController().ParentHands();
+        if (GameManager.Instance.Player.WeaponGameObject == null)
+            VrCore.instance.GetVRPlayerController().TurnOnBothHands();
+        else
+            VrCore.instance.GetVRPlayerController().TurnOnNonDominantHand();
+        VrCore.instance.GetVRPlayerController().inFreeRoam = false;
     }
 
     [HarmonyPrefix]
@@ -108,40 +201,7 @@ public class GameCameraPatches : BendyVRPatch
         __instance.PostProcessScript.enabled = false;        
     }
 
-    //Get rid of VR nausea simulator (CH2 Opening)
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(CH2OpeningSequenceController), nameof(CH2OpeningSequenceController.DOGetUpSequence))]
-    private static bool DontGetUp(CH2OpeningSequenceController __instance, ref Sequence __result)
-    {
-        Sequence sequence = DOTween.Sequence();
-        float num = 1f;
-        sequence.InsertCallback(num, delegate
-        {
-            __instance.m_GameCam.Camera.transform.SetParent(GameManager.Instance.Player.CameraParent);
-        });
-        sequence.InsertCallback(num += 0.5f, __instance.PlayIntroDialogue_02);
-        __result = sequence;        
-        return false;
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(CH2ClosingSequenceController), nameof(CH2ClosingSequenceController.HandleFinalTriggerOnEnter))]
-    private static bool VRHandleFinalTriggerOnEnter(CH2ClosingSequenceController __instance)
-    {
-        __instance.m_FinalTrigger.OnEnter -= __instance.HandleFinalTriggerOnEnter;
-        GameManager.Instance.HideCrosshair();
-        GameManager.Instance.LockPause();
-        GameManager.Instance.Player.SetCameraSway(active: true);
-        GameManager.Instance.Player.SetLock(active: true);
-        //GameManager.Instance.Player.HeadContainer.DOLookAt(__instance.m_FinalLookAt.position, 2f).SetEase(Ease.InOutQuad);
-        //VrCore.instance.GetVRPlayerController().mNewCameraParent.DOLookAt(__instance.m_FinalLookAt.position, 2f).SetEase(Ease.InOutQuad);        
-        
-        //TODO Might remove this completely - since if they turn around physically it will be off. 
-        VrCore.instance.GetVRPlayerController().mPlayerController.transform.DOLookAt(__instance.m_FinalLookAt.position, 2f).SetEase(Ease.InOutQuad);
-        GameManager.Instance.AudioManager.Play(__instance.m_CanKickClip);
-        __instance.DOSequence().OnComplete(__instance.SequenceOnComplete);
-        return false;
-    }
+    
 
 
     /*[HarmonyPostfix]

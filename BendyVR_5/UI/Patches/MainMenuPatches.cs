@@ -89,7 +89,18 @@ public class MainMenuPatches : BendyVRPatch
     [HarmonyPatch(typeof(BaseUIController), nameof(BaseUIController.InitController))]
     private static void CorrectSettingsCanvas(BaseUIController __instance)
     {
-        CanvasToWorldSpace.MoveToWorldSpace(__instance, 0.75f);
+        if (__instance is ScreenBlockerController)
+        {
+            CanvasToWorldSpace.MoveToCameraSpace(__instance,1f);        
+        }
+        else if (__instance is HurtBordersController)
+        {
+            CanvasToWorldSpace.MoveToCameraSpace(__instance,4f);
+        }
+        else
+        {
+            CanvasToWorldSpace.MoveToWorldSpace(__instance, 0.75f);
+        }
     }
 
     [HarmonyPostfix]

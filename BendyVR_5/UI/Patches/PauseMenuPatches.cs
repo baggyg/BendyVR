@@ -15,6 +15,7 @@ public static class PauseMenuPatches
     {
         //VrCore.instance.quitTriggered = true;
         //TODO - What the hell is this doing? Need to debug the whole thing
+        Application.Quit();
     }
 
 		

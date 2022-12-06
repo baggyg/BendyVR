@@ -9,7 +9,27 @@ using UnityEngine;
 namespace BendyVR_5.UI
 {
     public static class CanvasToWorldSpace
-    {        
+    {
+        public static void MoveToCameraSpace(BaseUIController __instance, float planeDistance = 1.0f)
+        {
+            Logs.WriteInfo($"Working with object ({__instance.name})");
+            var canvas = __instance.GetComponent<Canvas>();            
+            if (!canvas)
+            {
+                Logs.WriteError($"No Canvas Found in Object ({__instance.name})");
+                return;
+            }
+            if (canvas.renderMode == RenderMode.ScreenSpaceCamera)
+            {
+                Logs.WriteWarning($"Canvas already has render mode ({canvas.renderMode.ToString()})");
+                canvas.planeDistance = planeDistance;
+                return;
+            }
+            canvas.renderMode = RenderMode.ScreenSpaceCamera;
+            canvas.planeDistance = planeDistance;
+            Logs.WriteInfo($"Canvas Should be set to Screen Space Camera ({__instance.name})");
+        }
+
         public static void MoveToWorldSpace(BaseUIController __instance, float scale = 1.0f)
         {
             try

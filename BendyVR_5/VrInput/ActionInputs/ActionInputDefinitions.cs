@@ -5,12 +5,15 @@ namespace BendyVR_5.VrInput.ActionInputs;
 public static class ActionInputDefinitions
 {
     //Non-Dominant Hand
-    public static readonly BooleanActionInput SeeingTool = new(NonDominantHand.SeeingTool); //Default: Left Trigger
+    //public static readonly BooleanActionInput SeeingTool = new(NonDominantHand.SeeingTool); //Default: Left Trigger
+    public static readonly BooleanActionInput SeeingTool = new(NonDominantHand.Pause); //Default: Left Trigger
     public static readonly BooleanActionInput ExpoInvert = new(NonDominantHand.ExpoInvert); //Default: X
-    public static readonly BooleanActionInput Pause = new(NonDominantHand.Pause); //Default: Y
+    //public static readonly BooleanActionInput Pause = new(NonDominantHand.Pause); //Default: Y
+    public static readonly BooleanActionInput Pause = new(DominantHand.Interact); //Default: Y
 
     //Dominant Hand
-    public static readonly BooleanActionInput Interact = new(DominantHand.Interact); //Default: B
+    //public static readonly BooleanActionInput Interact = new(DominantHand.Interact); //Default: B
+    public static readonly BooleanActionInput Interact = new(NonDominantHand.SeeingTool); //Default: Left Trigger
     public static readonly BooleanActionInput Weapon = new(DominantHand.Weapon); //Default: RightTrigger
 
     //Movement Hand

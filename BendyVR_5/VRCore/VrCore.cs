@@ -185,7 +185,7 @@ public class VrCore : MonoBehaviour
 
     private void ResetHeight()
     {
-        float scale = VrSettings.WorldScale.Value;
+        /*float scale = VrSettings.WorldScale.Value;
         float offset = (-1.5f * scale) + 0.7f;
         offset += VrSettings.HeightOffset.Value;
         
@@ -198,7 +198,7 @@ public class VrCore : MonoBehaviour
         
         Logs.WriteInfo("Scale = " + scale);
         Logs.WriteInfo("Hand Offset = " + handContainerOffset);
-        Logs.WriteInfo("VrCameraParent Y = " + vrPlayerController.mNewCameraParent.localPosition.y);
+        Logs.WriteInfo("VrCameraParent Y = " + vrPlayerController.mNewCameraParent.localPosition.y);*/
     }
 
     private void Update()

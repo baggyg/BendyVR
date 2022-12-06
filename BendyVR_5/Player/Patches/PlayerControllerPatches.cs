@@ -3,10 +3,8 @@ using DG.Tweening;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using TMG.Controls;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace BendyVR_5.Player.Patches;
 
@@ -21,9 +19,61 @@ public class PlayerControllerPatches : BendyVRPatch
 		return false; 
 	}
 
+	[HarmonyPrefix]
+	[HarmonyPatch(typeof(EventTrigger), nameof(EventTrigger.OnTriggerEnter))]
+	private static void WhatAmICollidingWith(EventTrigger __instance, Collider col)
+	{
+		Logs.WriteWarning(__instance.transform.name + " Collided with " + col.transform.name);
+	}
 
-
-
+	[HarmonyPrefix]
+	[HarmonyPatch(typeof(HurtBordersController), nameof(HurtBordersController.ShowBorder))]
+	public static bool VRShowBorder(HurtBordersController __instance, bool isSilent = false)
+	{
+		if (__instance.m_HitCount >= __instance.m_HitMax)
+		{
+			/*if (!__instance.m_IsHitMax)
+			{
+				GameManager.Instance.isDead = true;
+				__instance.m_HitCount--;
+				__instance.m_IsHitMax = true;
+				__instance.m_BlackImage.DOKill();
+				__instance.m_BlackImage.DOFade(1f, 0.2f).SetEase(Ease.Linear);
+				GameManager.Instance.ShowScreenBlocker(0f);
+				GameManager.Instance.HideCrosshair();
+				__instance.PlayAudio(ref __instance.m_DeathClips);
+				//How do I do this?
+				//__instance.OnMaxHit.Send(__instance);				
+				__instance.OnMaxHit += __instance;
+			}*/
+			return true; //If we are dying send through the original code
+		}
+		if (!isSilent)
+		{
+			__instance.PlayAudio(ref __instance.m_HurtClips);
+		}
+		__instance.m_IsHit = true;
+		__instance.m_Timer = 0f;
+		//Don't do any camera stuff
+		/*Transform camera = GameManager.Instance.GameCamera.transform;
+		camera.localPosition = Vector3.zero;
+		camera.DOShakePosition(0.75f, 0.35f, 15).OnComplete(delegate
+		{
+			camera.localPosition = Vector3.zero;
+		});*/
+		for (int i = 0; i < __instance.m_HitMax && i <= __instance.m_HitCount; i++)
+		{
+			Image image = __instance.m_Borders[i];
+			image.DOKill();
+			image.rectTransform.DOKill();
+			image.enabled = true;
+			image.color = Color.white;
+			image.rectTransform.localScale = Vector3.one;
+			image.rectTransform.DOScale(1.005f, 0.25f + (float)i * 0.005f).SetEase(Ease.InOutQuad).SetLoops(-1, LoopType.Yoyo);
+		}
+		__instance.m_HitCount++;
+		return false;
+	}
 
 	/*[HarmonyPrefix]
 	[HarmonyPatch(typeof(PlayerController), nameof(PlayerController.GetRotations))]

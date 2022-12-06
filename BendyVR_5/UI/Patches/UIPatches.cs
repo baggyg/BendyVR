@@ -7,6 +7,7 @@ using BendyVR_5.Helpers;
 using UnityEngine;
 using UnityEngine.UI;
 using TMG.UI;
+using TMG.Core;
 
 namespace BendyVR_5.UI.Patches;
 
@@ -22,6 +23,13 @@ public class UIPatches : BendyVRPatch
         //__instance.gameObject.GetComponent<CanvasScaler>().uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
         __instance.gameObject.GetComponent<CanvasScaler>().enabled = false;
         __instance.rectTransform.sizeDelta = new Vector2(2408, 2428);
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PreLoaderController), nameof(PreLoaderController.PlayOut))]
+    private static bool VRPreloadFramework()
+    {
+        return false;
     }
 
     /*[HarmonyPrefix]
@@ -61,13 +69,13 @@ public class UIPatches : BendyVRPatch
         __instance.transform.localPosition = new Vector3(1120f, 900f, 0f);
     }
 
-    [HarmonyPostfix]
+    /*[HarmonyPostfix]
     [HarmonyPatch(typeof(HurtBordersController), nameof(HurtBordersController.InitController))]
     private static void RepositionHurt(HurtBordersController __instance)
     {
         Logs.WriteInfo("Repositioning Hurt");
         __instance.transform.localScale = new Vector3(1.5f, 1.5f, 1.5f);
-    }
+    }*/
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(MainSubtitlesController), nameof(MainSubtitlesController.InitController))]
