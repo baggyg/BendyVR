@@ -25,19 +25,20 @@ public class UIPatches : BendyVRPatch
         __instance.rectTransform.sizeDelta = new Vector2(2408, 2428);
     }
     
-    [HarmonyPrefix]
+    /*[HarmonyPrefix]
     [HarmonyPatch(typeof(PreLoaderController), nameof(PreLoaderController.PlayOut))]
     private static bool VRPreloadFramework()
     {
         return false;
-    }
-
-    /*[HarmonyPrefix]
-    [HarmonyPatch(typeof(CanvasScaler), nameof(CanvasScaler.Start))]
-    private static void SetConstantSize(CanvasScaler __instance)
-    {
-        __instance.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
     }*/
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PreLoaderController), nameof(PreLoaderController.InitController))]
+    private static void CullSecondaryCamera(PreLoaderController __instance)
+    {
+        GameObject.Find("GameCamera_PostProcess").GetComponent<Camera>().cullingMask = 0;        
+    }
+        
 
     //On higher World Scales the projections weren't showing. God knows why but this fixes it. 
     [HarmonyPrefix]

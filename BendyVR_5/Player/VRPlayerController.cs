@@ -35,13 +35,18 @@ internal class VRPlayerController : MonoBehaviour
 	bool mInitialHeightSet = false;
 	float mInitialHeight = 0f;
 	float mInitialHeightOffset = 0f;
-
+    public Vector3[] throwVelocityVectors = new Vector3[15];
+	public int throwVelocityNext = -1;
 
 	public VrLaser mLaser;
 	bool enabled = false;
 	bool hasMeleeWeapon = false;
 	bool hasGunWeapon = false;
+	bool hasThrowWeapon = false;
+
 	public bool inFreeRoam = false;
+	public bool attackedPressedMiniGame = false;
+	public float miniGameThrowMultiplier = 100f;
 
 	private Vector3 velocity;
 	private Vector3 lastPos;
@@ -147,6 +152,38 @@ internal class VRPlayerController : MonoBehaviour
 		enabled = true;
 	}
 
+	public Vector3 GetAverageVelocity()
+    {
+		Vector3 aveVelocity = Vector3.zero;
+		for (int i = 0; i < 15; i++)
+		{
+			aveVelocity += throwVelocityVectors[i];
+		}
+		return (aveVelocity / 15);
+	}
+
+	public void AddVelocity()
+    {
+		//Store 15 frames of velocity or whatever
+		if (throwVelocityNext == -1)
+		{
+			for (int i = 0; i < 15; i++)
+			{
+				throwVelocityVectors[i] = Vector3.zero;
+			}
+			throwVelocityNext++;
+		}
+		else
+		{
+			TryGetDominantHandNodeStateVelocity(out throwVelocityVectors[throwVelocityNext]);
+			throwVelocityNext++;
+			if (throwVelocityNext == 15)
+			{
+				throwVelocityNext = 0;
+			}
+		}
+	}
+	
 	public void ParentHands()
     {
 		mNonDominantHand.parent = mNewHandParent;
@@ -160,7 +197,60 @@ internal class VRPlayerController : MonoBehaviour
 		mPlayerController.CameraParent.SetParent(mNewCameraParent);
 
 		//Set the Camera to also be below VrCameraParent - GB Why??? This screws up Miracle Stations
-		GameManager.Instance.GameCamera.transform.SetParent(mNewCameraParent);
+		GameManager.Instance.GameCamera.Camera.transform.SetParent(mNewCameraParent);
+	}
+
+	public void ExitFreeRoam()
+    {
+		Transform freeRoamCam = GameManager.Instance.GameCamera.FreeRoamCam;
+		//Original Code
+		Vector3 zero = Vector3.zero;
+		zero.x = freeRoamCam.eulerAngles.x;
+		Vector3 zero2 = Vector3.zero;
+		zero2.y = freeRoamCam.localEulerAngles.y;
+		//This doesn't move anymore as its a child of mNewCameraParent
+		//GameManager.Instance.GameCamera.CameraContainer.SetParent(GameManager.Instance.GameCamera.HeadContainer);
+		mNewCameraParent.SetParent(mPlayerController.HeadContainer);
+		mNewHandParent.SetParent(mPlayerController.m_HandContainer);
+		//GameManager.Instance.GameCamera.CameraContainer.localPosition = Vector3.zero;
+		//GameManager.Instance.GameCamera.CameraContainer.localEulerAngles = Vector3.zero;
+		//GameManager.Instance.GameCamera.CameraContainer.localScale = Vector3.one;
+		GameManager.Instance.Player.LookRotation(Quaternion.Euler(zero2), Quaternion.Euler(zero));
+		GameManager.Instance.Player.SetLockedMovement(active: false);
+		GameManager.Instance.GameCamera.FreeRoamCam.SetParent(null);
+		GameManager.Instance.Player.EnableSeeingTool(active: true);
+		//Don't think we need this anymore
+		//vrCore.GetVRPlayerController().SetupCameraHierarchy();
+		Logs.WriteWarning("Exiting Free Roam. '" + GameManager.Instance.GameCamera.CameraContainer.gameObject.name + "' parent is '" + GameManager.Instance.GameCamera.CameraContainer.parent.name + "'");
+		ResetRoomDampener();
+		SetupCameraFollow();
+		inFreeRoam = false;
+	}
+
+	public Transform InitializeFreeRoam()
+    {
+		//Removing Follow
+		RemoveCameraFollow();
+
+		Logs.WriteWarning("INITIALISING FREE ROAM");
+		//Original Code
+		GameManager.Instance.Player.EnableSeeingTool(active: false);
+		GameManager.Instance.Player.SetLockedMovement(active: true);
+		Transform freeRoamCam = GameManager.Instance.GameCamera.FreeRoamCam;
+		freeRoamCam.position = GameManager.Instance.GameCamera.CameraContainer.position;
+		freeRoamCam.rotation = GameManager.Instance.GameCamera.CameraContainer.rotation;
+		//GameManager.Instance.GameCamera.CameraContainer.SetParent(freeRoamCam);
+		//GameManager.Instance.GameCamera.CameraContainer.localScale = Vector3.one;
+		Logs.WriteWarning("FreeRoam Tranform = " + freeRoamCam.name);
+
+		//Instead of the above - lets now put the roomscale dampener there
+		mNewCameraParent.SetParent(freeRoamCam);
+		mNewHandParent.SetParent(freeRoamCam);
+		//GameManager.Instance.GameCamera.CameraContainer.SetParent(freeRoamCam);
+		//GameManager.Instance.GameCamera.Camera.transform.SetParent(freeRoamCam);
+		
+		inFreeRoam = true;
+		return freeRoamCam;		
 	}
 
 	public void SetupCameraFollow()
@@ -175,6 +265,58 @@ internal class VRPlayerController : MonoBehaviour
 		//Move the Camera Container to match the VR Camera (which is auto tracked)
 		UnityEngine.Object.Destroy(mFollowCameraParent);
 		UnityEngine.Object.Destroy(mFollowHandParent);
+	}
+
+	public void SetupThrowWeapon(string weapon_name)
+	{
+		Logs.WriteInfo("SetupThrowWeapon");
+
+		//Turn off animator on hand
+		Transform hand = mDominantHand.Find("Hand");
+		if (hand == null)
+		{
+			Logs.WriteError("Hand is Null");
+			return;
+		}
+		Animator _anim = hand.gameObject.GetComponent<Animator>();
+		if (_anim == null)
+		{
+			Logs.WriteError("Animator is Null");
+			return;
+		}
+		_anim.enabled = false;
+
+		//Set Up Local Position
+		Transform animator = hand.Find("WeaponAnimator");
+		animator.localPosition = Vector3.zero;
+		animator.localRotation = Quaternion.identity;
+
+		Transform weapon = animator.Find(weapon_name);
+		weapon.localPosition = new Vector3(0f, -0.2f, -0.1f);
+		weapon.localEulerAngles = new Vector3(350f, 350f, 0f);
+
+		if (weapon_name.ToLower().Equals("weapon_baconsoup") ||
+			weapon_name.ToLower().Equals("weapon_baconsoup(clone)"))
+		{
+			weapon.localEulerAngles = new Vector3(90f, 0f, 0f);
+			weapon.localPosition = new Vector3(0f, 0f, -0.1f);
+			weapon.localScale = new Vector3(0.3f, 0.3f, 0.3f);			
+		}
+
+		//Loop through all children (apart from interaction)
+		for (int i = 0; i < weapon.childCount; i++)
+		{
+			Transform child = weapon.GetChild(i);
+			if (!child.name.ToLower().Equals("interaction"))
+			{
+				child.localPosition = Vector3.zero;
+				child.localRotation = Quaternion.identity;
+			}
+		}		
+
+		//Turn Off Glove
+		TurnOffDominantHand();
+		hasThrowWeapon = true;
 	}
 
 	public void SetupGunWeapon(string weapon_name)
@@ -203,7 +345,7 @@ internal class VRPlayerController : MonoBehaviour
 
 		Transform weapon = animator.Find(weapon_name);
 		weapon.localPosition = new Vector3(0f, -0.2f, -0.1f);
-		weapon.localEulerAngles = new Vector3(350f, 350f, 0f);		
+		weapon.localEulerAngles = new Vector3(350f, 350f, 0f);
 
 		//Loop through all children (apart from interaction)
 		for (int i = 0; i < weapon.childCount; i++)
@@ -216,15 +358,34 @@ internal class VRPlayerController : MonoBehaviour
 			}
 		}
 
-		//Move the Bullets / Sparks Etc
-		Transform sparks = weapon.Find("Sparks_TriggerOnly");
-		sparks.localPosition = new Vector3(0f,-2.2f,0.2f);
-		sparks.localEulerAngles = new Vector3(90f, 0f, 0f);
+		if (weapon_name.ToLower().Equals("model_pelletgun") ||
+			weapon_name.ToLower().Equals("model_pelletgun(clone)"))
+		{
+			weapon.localPosition = new Vector3(0f, 0f, -0.15f);
+			weapon.localEulerAngles = new Vector3(350f, 350f, 270f);
+		}
+		else if (weapon_name.ToLower().Equals("ball") ||
+			weapon_name.ToLower().Equals("ball(clone)"))
+		{
+			weapon.localPosition = new Vector3(0f, 0f, -0.1f);
+			weapon.localEulerAngles = new Vector3(90f, 0f, 0f);
+		}
+		else 
+		{
+			//Move the Bullets / Sparks Etc
+			Transform sparks = weapon.Find("Sparks_TriggerOnly");
+			sparks.localPosition = new Vector3(0f, -2.2f, 0.2f);
+			sparks.localEulerAngles = new Vector3(90f, 0f, 0f);
 
-		//Move the Bullets / Sparks Etc
-		Transform bullets = weapon.Find("InkBullet");
-		bullets.localPosition = new Vector3(0f, -2.2f, 0.2f);
-		bullets.localEulerAngles = new Vector3(90f, 0f, 0f);
+			//Move the Bullets / Sparks Etc
+			Transform bullets = weapon.Find("InkBullet");
+			bullets.localPosition = new Vector3(0f, -2.2f, 0.2f);
+			bullets.localEulerAngles = new Vector3(90f, 0f, 0f);
+		}
+
+		
+
+		
 
 		//Turn Off Glove
 		TurnOffDominantHand();
@@ -398,6 +559,23 @@ internal class VRPlayerController : MonoBehaviour
 		position = new Vector3();
 		return false;
 	}
+	public bool TryGetDominantHandNodeStateVelocity(out Vector3 velocity)
+	{
+		InputTracking.GetNodeStates(nodeStatesCache);
+		for (int i = 0; i < nodeStatesCache.Count; i++)
+		{
+			XRNodeState nodeState = nodeStatesCache[i];
+			if ((VrSettings.LeftHandedMode.Value == true && nodeState.nodeType == XRNode.LeftHand) || 
+				(VrSettings.LeftHandedMode.Value == false && nodeState.nodeType == XRNode.RightHand))
+			{
+				if (nodeState.TryGetVelocity(out velocity))
+					return true;
+			}
+		}
+		// This is the fail case, where there was no hand available.
+		velocity = new Vector3();
+		return false;
+	}
 
 
 	private void Update()
@@ -507,7 +685,6 @@ internal class VRPlayerController : MonoBehaviour
 				if (mPlayerController.m_CharacterController.enabled)
 				{
 					Logs.WriteWarning("External Force Applied");
-					//Experimentally remove force from player (to stop falling through walls etc)
 					mPlayerController.m_CharacterController.Move(mPlayerController.m_ExternalForce * Time.fixedDeltaTime);
 				}
 				mPlayerController.m_ExternalForce = Vector3.MoveTowards(mPlayerController.m_ExternalForce, Vector3.zero, 3f * Time.fixedDeltaTime * num);
@@ -525,6 +702,13 @@ internal class VRPlayerController : MonoBehaviour
 		
 	}
 
+	private void ResetRoomDampener()
+    {
+		Vector3 newPosition = GameManager.Instance.GameCamera.transform.localPosition;		
+		mNewCameraParent.localEulerAngles = Vector3.zero;
+		mNewCameraParent.localPosition = new Vector3(-newPosition.x, (mInitialHeight + 0.2f), -newPosition.z) * VrSettings.WorldScale.Value;		
+	}
+	
 	private void AdjustRoomDampener()
     {
 		//Move Room Dampener (Defi X and Z)
@@ -577,11 +761,11 @@ internal class VRPlayerController : MonoBehaviour
 			}
 		}
 
-		Vector3 camDiff = mPlayerController.transform.position - GameManager.Instance.GameCamera.transform.position;
-		Vector3 headDiff = mPlayerController.HeadContainer.transform.position - GameManager.Instance.GameCamera.transform.position;
-
 		if (!inFreeRoam)
 		{
+			Vector3 camDiff = mPlayerController.transform.position - GameManager.Instance.GameCamera.transform.position;
+			Vector3 headDiff = mPlayerController.HeadContainer.transform.position - GameManager.Instance.GameCamera.transform.position;
+		
 			if (Mathf.Abs(camDiff.x) > 0.01 || Mathf.Abs(camDiff.z) > 0.01 || Mathf.Abs(headDiff.x) > 0.01 || Mathf.Abs(headDiff.z) > 0.01)
 				Logs.WriteInfo("PC -> Cam : " + camDiff.x + " " + camDiff.z + "Head -> Cam : " + headDiff.x + " " + headDiff.z);
 		}

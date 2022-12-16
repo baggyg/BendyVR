@@ -5,6 +5,8 @@ using HarmonyLib;
 using S13Audio;
 using UnityEngine;
 using UnityEngine.PostProcessing;
+using TMG.Core;
+using System;
 
 namespace BendyVR_5.VrCamera.Patches;
 
@@ -17,28 +19,7 @@ public class GameCameraPatches : BendyVRPatch
     [HarmonyPatch(typeof(GameCamera), nameof(GameCamera.ExitFreeRoamCam))]
     public static bool VRExitFreeRoamCam(GameCamera __instance)
     {
-        Vector3 zero = Vector3.zero;
-        zero.x = __instance.FreeRoamCam.eulerAngles.x;
-        Vector3 zero2 = Vector3.zero;
-        zero2.y = __instance.FreeRoamCam.localEulerAngles.y;
-        GameManager.Instance.GameCamera.CameraContainer.SetParent(GameManager.Instance.GameCamera.HeadContainer);
-
-        //Set Camera Container to be below new VrCameraParent
-        VrCore vrCore = VrCore.instance;
-        vrCore.GetVRPlayerController().SetupCameraHierarchy();
-
-        Logs.WriteWarning("Exiting Free Roam. '" + GameManager.Instance.GameCamera.CameraContainer.gameObject.name + "' parent is '" + GameManager.Instance.GameCamera.CameraContainer.parent.name + "'");
-        
-        GameManager.Instance.GameCamera.CameraContainer.localPosition = Vector3.zero;
-        GameManager.Instance.GameCamera.CameraContainer.localEulerAngles = Vector3.zero;
-        GameManager.Instance.GameCamera.CameraContainer.localScale = Vector3.one;
-        GameManager.Instance.Player.LookRotation(Quaternion.Euler(zero2), Quaternion.Euler(zero));
-        GameManager.Instance.Player.SetLockedMovement(active: false);
-        GameManager.Instance.GameCamera.FreeRoamCam.SetParent(null);
-        GameManager.Instance.Player.EnableSeeingTool(active: true);
-
-        vrCore.GetVRPlayerController().SetupCameraFollow();
-        VrCore.instance.GetVRPlayerController().inFreeRoam = false;
+        VrCore.instance.GetVRPlayerController().ExitFreeRoam();        
         return false;
     }
 
@@ -46,27 +27,19 @@ public class GameCameraPatches : BendyVRPatch
     [HarmonyPatch(typeof(GameCamera), nameof(GameCamera.InitializeFreeRoamCam))]
     public static bool VRInitializeFreeRoamCam(ref Transform __result)
     {
-        Logs.WriteWarning("INITIALISING FREE ROAM");
-        GameManager.Instance.Player.EnableSeeingTool(active: false);
-        GameManager.Instance.Player.SetLockedMovement(active: true);
-
-        //Removing Follow
-        VrCore.instance.GetVRPlayerController().RemoveCameraFollow();
-        
-        Transform freeRoamCam = GameManager.Instance.GameCamera.FreeRoamCam;
-        Logs.WriteWarning("FreeRoam Tranform = " + freeRoamCam.name);
-        freeRoamCam.position = GameManager.Instance.GameCamera.CameraContainer.position;
-        freeRoamCam.rotation = GameManager.Instance.GameCamera.CameraContainer.rotation;
-        
-        GameManager.Instance.GameCamera.CameraContainer.SetParent(freeRoamCam);
-        GameManager.Instance.GameCamera.CameraContainer.localScale = Vector3.one;
-        
-        __result = freeRoamCam;
-        VrCore.instance.GetVRPlayerController().inFreeRoam = true;
+        __result = VrCore.instance.GetVRPlayerController().InitializeFreeRoam();        
         return false;
     }
 
     [HarmonyPrefix]
+    [HarmonyPatch(typeof(LittleMiracleStationController), nameof(LittleMiracleStationController.HandleDoorInteractableOnInteracted))]
+    private static bool MiracleStationEntry(LittleMiracleStationController __instance)
+    {
+        GameManager.Instance.ShowScreenBlocker(0.3f);
+        return true;
+    }
+
+    /*[HarmonyPrefix]
     [HarmonyPatch(typeof(LittleMiracleStationController), nameof(LittleMiracleStationController.HandleDoorInteractableOnInteracted))]
     private static bool MiracleStationEntry(LittleMiracleStationController __instance)
     {
@@ -78,7 +51,7 @@ public class GameCameraPatches : BendyVRPatch
         __instance.m_Player.SetLockedMovement(active: true);
         __instance.m_Player.SetCollision(active: false);
         GameManager.Instance.HideCrosshair();
-        
+
         Transform freeRoamCam = GameManager.Instance.GameCamera.FreeRoamCam;
         freeRoamCam.position = GameManager.Instance.GameCamera.CameraContainer.position;
         freeRoamCam.rotation = GameManager.Instance.GameCamera.CameraContainer.rotation;
@@ -126,13 +99,38 @@ public class GameCameraPatches : BendyVRPatch
         num += 0.25f;
         sequence.Insert(num, __instance.m_Door.DOLocalRotate(Vector3.zero, 0.7f).SetEase(Ease.InOutQuad));
         sequence.OnComplete(__instance.HandleEntranceOnComplete);
-        //__instance.OnInteract.Send(__instance);
+        TMGExtensions.Send(__instance.OnInteract, __instance);
+        __instance.OnInteract.Send(__instance);
+        __instance.OnInteract?.Invoke(__instance, EventArgs.Empty);
+
+
         return false;
-    }
-    [HarmonyPostfix]
+    }*/
+
+    [HarmonyPrefix]
     [HarmonyPatch(typeof(LittleMiracleStationController), nameof(LittleMiracleStationController.HandleEntranceOnComplete))]
     private static void TurnOffHands()
     {
+        Transform freeRoamCam = GameManager.Instance.GameCamera.FreeRoamCam;
+        //Check we don't already have the offset (so we don't create one million 543 thousand game objects)
+        Transform cameraOffset = freeRoamCam.Find("MiracleCameraOffset");
+        if (cameraOffset == null)
+            cameraOffset = new GameObject("MiracleCameraOffset").transform;
+        cameraOffset.SetParent(freeRoamCam);
+        cameraOffset.localRotation = Quaternion.identity;
+        //cameraOffset.localPosition = new Vector3(0f,-GameManager.Instance.GameCamera.Camera.transform.localPosition.y, 0f);
+        cameraOffset.localPosition = -GameManager.Instance.GameCamera.Camera.transform.localPosition;
+
+        GameManager.Instance.GameCamera.CameraContainer.SetParent(freeRoamCam);
+        GameManager.Instance.GameCamera.CameraContainer.localScale = Vector3.one;
+        GameManager.Instance.GameCamera.Camera.transform.SetParent(cameraOffset);
+        VrCore.instance.GetVRPlayerController().inFreeRoam = true;
+        VrCore.instance.GetVRPlayerController().mDominantHand.SetParent(cameraOffset);
+        VrCore.instance.GetVRPlayerController().mNonDominantHand.SetParent(cameraOffset);
+
+        //Removing Follow
+        VrCore.instance.GetVRPlayerController().RemoveCameraFollow();        
+
         //GB New also need to move the camera there (and the hands)        
         Logs.WriteWarning("Turning Off Both hands");
         VrCore.instance.GetVRPlayerController().TurnOffBothHands();

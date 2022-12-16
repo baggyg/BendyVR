@@ -58,7 +58,7 @@ public class HoldableItemPatches : BendyVRPatch
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(GunWeapon), nameof(GunWeapon.OnEquip))]
-    private static void PrepareAxe(GunWeapon __instance)
+    private static void PrepareGun(GunWeapon __instance)
     {
         //GB - May need to change this to the specific HandleAxeOnEquipped calls whenever they occur
         VRPlayerController vrPlayerController = VrCore.instance.GetVRPlayerController();
@@ -71,6 +71,58 @@ public class HoldableItemPatches : BendyVRPatch
         __instance.transform.SetParent(GameManager.Instance.Player.WeaponParent);
 
         vrPlayerController.SetupGunWeapon(__instance.transform.name);
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ThrowWeapon), nameof(ThrowWeapon.OnEquip))]
+    private static void PrepareThrowWeapon(ThrowWeapon __instance)
+    {
+        //GB - May need to change this to the specific HandleAxeOnEquipped calls whenever they occur
+        VRPlayerController vrPlayerController = VrCore.instance.GetVRPlayerController();
+
+        //Poss Fix - Make sure this is the child of hand (not sure why its not here)
+        Logs.WriteWarning("Preparing Throw Weapon " + __instance.transform.name);
+        Logs.WriteWarning("Parent is " + __instance.transform.parent.name);
+
+        //Set Up Local Position
+        __instance.transform.SetParent(GameManager.Instance.Player.WeaponParent);
+
+        vrPlayerController.SetupThrowWeapon(__instance.transform.name);
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ThrowWeapon), nameof(ThrowWeapon.Reload))]
+    private static bool AdjustReloadAngles(ThrowWeapon __instance)
+    {
+        __instance.m_IsReloading = true;
+        if (__instance.CurrentAmmo > 0)
+        {
+            Sequence sequence = DOTween.Sequence();
+            sequence.Insert(0f, __instance.transform.DOLocalMoveY(-0.6f, 0f));
+            sequence.Insert(0f, __instance.transform.DOLocalMoveZ(-0.6f, 0f));
+            sequence.Insert(0f, __instance.transform.DOLocalRotate(new Vector3(30f, 0f, 0f), 0f));
+            sequence.Insert(0.75f, __instance.transform.DOLocalMoveY(0f, 0.5f).SetEase(Ease.OutQuad));
+            sequence.Insert(0.75f, __instance.transform.DOLocalMoveZ(-0.1f, 0.5f).SetEase(Ease.OutQuad));
+            sequence.Insert(0.75f, __instance.transform.DOLocalRotate(new Vector3(90f, 0f, 0f), 0.4f).SetEase(Ease.OutQuad));
+            sequence.OnComplete(__instance.ReloadOnComplete);
+            return false;
+        }
+        GameManager.Instance.Player.UnEquipWeapon();
+        if ((bool)GameManager.Instance.Player.InactiveWeapon)
+        {
+            GameManager.Instance.Player.WeaponGameObject = GameManager.Instance.Player.InactiveWeapon;
+            GameManager.Instance.Player.InactiveWeapon = null;
+        }
+        else
+        {
+            GameManager.Instance.Player.WeaponGameObject = null;
+        }
+        Sequence s = DOTween.Sequence();
+        s.Insert(0f, __instance.transform.DOLocalMoveY(-0.6f, 0f));
+        s.Insert(0f, __instance.transform.DOLocalMoveZ(-0.6f, 0f));
+        s.Insert(0f, __instance.transform.DOLocalRotate(new Vector3(30f, 0f, 0f), 0f));
+        s.InsertCallback(0.2f, __instance.Dispose);
+        return false;
     }
 
     [HarmonyPostfix]
@@ -261,7 +313,8 @@ public class HoldableItemPatches : BendyVRPatch
     {
         //Attack is always called
         //((!m_IsHoldToAttack) ? PlayerInput.Attack() : PlayerInput.AttackHold())
-        if (__instance is GunWeapon)
+        if (__instance is GunWeapon ||
+            __instance is ThrowWeapon)
         {
             if (__instance .m_CanAttack && __instance.m_IsEquipped && 
                 !GameManager.Instance.Player.isLocked && 
