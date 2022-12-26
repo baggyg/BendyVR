@@ -42,14 +42,14 @@ public class StagePatches : BendyVRPatch
     }
 
     
-    [HarmonyPrefix]            
+    /*[HarmonyPrefix]            
     [HarmonyPatch(typeof(CH5OpeningSequenceController), nameof(CH5OpeningSequenceController.Activate))]
     public static bool EndDemo()
     {
         ErrorPresenter.Show("End of the Early Access 3 Demo. Your game has been saved!");
         
         return false;
-    }
+    }*/
 
 
     /*[HarmonyPrefix]

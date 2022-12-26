@@ -7,6 +7,7 @@ using S13Audio;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using TMG.Controls;
 using UnityEngine;
@@ -17,6 +18,99 @@ namespace BendyVR_5.Player.Patches;
 public class HoldableItemPatches : BendyVRPatch
 {
     [HarmonyPrefix]
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.EnableSeeingTool))]
+    public static bool EnableSeeingTool(PlayerController __instance, bool active)
+    {
+        __instance.m_IsSeeingToolEnabled = active;
+        if (active)
+        {
+            VRPlayerController vrPlayerController = VrCore.instance.GetVRPlayerController();
+
+            Logs.WriteWarning("Preparing Seeeing Tool " + __instance.m_SeeingTool.name);
+            Logs.WriteWarning("Parent is " + __instance.m_SeeingTool.name);
+
+            //Set Up Local Position
+            __instance.m_SeeingTool.SetParent(GameManager.Instance.Player.WeaponParent);
+
+            vrPlayerController.SetupSeeingTool(__instance.m_SeeingTool.name);
+        }
+        return false;
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.UseSeeingTool))]
+    public static bool VRUseSeeingTool(PlayerController __instance, bool active)
+    {
+        if (active && __instance.isMoveLocked)
+        {
+            __instance.isSeeingToolActive = !__instance.isSeeingToolActive;
+            return false;
+        }
+        __instance.m_SeeingToolSequence.Kill();
+        __instance.m_SeeingToolSequence = DOTween.Sequence();
+        float num = 0f;
+        if (active)
+        {
+            //This is going to screw me up again
+            //__instance.OnSeeingToolActive.Send(this);
+            var handler = typeof(PlayerController).GetField("OnSeeingToolActive", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(__instance) as Delegate;
+            if(handler != null)
+            {
+                var subscribers = handler.GetInvocationList();
+                foreach(var subscriber in subscribers)
+                {
+                    subscriber.DynamicInvoke(__instance, EventArgs.Empty);
+                }
+            }            
+            __instance.SetInteraction(active: false);
+            __instance.SetLockedMovement(active: true);
+            __instance.m_SeeingTool.localPosition = Vector3.zero;
+            
+            //If already has a weapon then
+            if ((bool)__instance.WeaponGameObject)
+            {
+                //__instance.m_SeeingToolSequence.Insert(num, __instance.WeaponGameObject.transform.DOLocalMoveY(-5f, 0.4f).SetEase(Ease.InQuad));                
+                //num += 0.35f;
+                __instance.m_SeeingToolSequence.InsertCallback(num, delegate
+                {
+                    __instance.WeaponGameObject.SetActive(value: false);
+                    __instance.m_SeeingTool.gameObject.SetActive(value: true);
+                });
+            }
+            else
+            {
+                __instance.m_SeeingTool.gameObject.SetActive(value: true);
+            }
+            VrCore.instance.GetVRPlayerController().TurnOffDominantHand();
+            //m_SeeingToolSequence.Insert(num, m_SeeingTool.DOLocalMoveY(0f, 0.4f).SetEase(Ease.OutQuad));
+            S13AudioManager.Instance.InvokeEvent("evt_seeing_tool_on");
+            return false;
+        }
+        //__instance.m_SeeingToolSequence.Insert(num, m_SeeingTool.DOLocalMoveY(-5f, 0.4f).SetEase(Ease.InQuad));
+        //num += 0.4f;
+        __instance.m_SeeingToolSequence.InsertCallback(num, delegate
+        {
+            __instance.m_SeeingTool.gameObject.SetActive(value: false);
+            if ((bool)__instance.WeaponGameObject)
+            {
+                __instance.WeaponGameObject.SetActive(value: true);
+            }
+            else
+            {
+                VrCore.instance.GetVRPlayerController().TurnOnDominantHand();
+            }
+            __instance.SetInteraction(active: true);
+            __instance.SetLockedMovement(active: false);
+        });
+        /*if ((bool)__instance.WeaponGameObject)
+        {
+            __instance.m_SeeingToolSequence.Insert(num, WeaponGameObject.transform.DOLocalMoveY(0f, 0.4f).SetEase(Ease.OutQuad));
+        }*/
+        S13AudioManager.Instance.InvokeEvent("evt_seeing_tool_off");
+        return false;
+    }
+
+    [HarmonyPrefix]
     [HarmonyPatch(typeof(Holdable), nameof(Holdable.Remove))]
     public static bool RemoveHoldableItem(Holdable __instance)
     {
@@ -25,6 +119,7 @@ public class HoldableItemPatches : BendyVRPatch
         {
             S13AudioManager.Instance.InvokeEvent("evt_ink_deposited");
         }
+        //TODO Check its not the ink thingy only else hand won't come back
         if ((bool)GameManager.Instance.Player.InactiveWeapon)
         {
             GameManager.Instance.Player.WeaponGameObject = GameManager.Instance.Player.InactiveWeapon;

@@ -40,7 +40,8 @@ internal class VRPlayerController : MonoBehaviour
 
 	public VrLaser mLaser;
 	bool enabled = false;
-	bool hasMeleeWeapon = false;
+
+    bool hasMeleeWeapon = false;
 	bool hasGunWeapon = false;
 	bool hasThrowWeapon = false;
 
@@ -73,7 +74,7 @@ internal class VRPlayerController : MonoBehaviour
 		//Turn down the radius of character controller so wall pushback isn't such a problem
 		CharacterController cc = mPlayerController.GetComponent<CharacterController>();
 		//Some falling through levels. Lets keep it as is and see if people complain
-		//cc.radius = 0.3f;
+		//cc.radius = 0.75f;
 
 		//Set up a new camera parent
 		mNewCameraParent = new GameObject("RoomScaleDamper").transform;
@@ -151,6 +152,8 @@ internal class VRPlayerController : MonoBehaviour
 
 		enabled = true;
 	}
+
+	
 
 	public Vector3 GetAverageVelocity()
     {
@@ -392,6 +395,49 @@ internal class VRPlayerController : MonoBehaviour
 		hasGunWeapon = true;
 	}
 
+	public void SetupSeeingTool(string name)
+	{
+		Logs.WriteInfo("SetupSeeingTool");
+		//Turn off animator on hand
+		Transform hand = mDominantHand.Find("Hand");
+		if (hand == null)
+		{
+			Logs.WriteError("Hand is Null");
+			return;
+		}
+		Animator _anim = hand.gameObject.GetComponent<Animator>();
+		if (_anim == null)
+		{
+			Logs.WriteError("Animator is Null");
+			return;
+		}
+		_anim.enabled = false;
+
+		//Set Up Axe Local Position
+		Transform animator = hand.Find("WeaponAnimator");
+		animator.localPosition = Vector3.zero;
+		animator.localRotation = Quaternion.identity;
+
+		Transform weapon = animator.Find(name);
+		weapon.localPosition = Vector3.zero;
+		weapon.localEulerAngles = new Vector3(90f, 350f, 0f);
+		weapon.localScale = new Vector3(0.33f, 0.33f, 0.33f);
+
+		//Loop through all children (apart from interaction)
+		for (int i = 0; i < weapon.childCount; i++)
+		{
+			Transform child = weapon.GetChild(i);
+			if (!child.name.ToLower().Equals("interaction"))
+			{
+				child.localPosition = Vector3.zero;
+				child.localRotation = Quaternion.identity;
+			}
+		}
+		
+		//Turn Off Glove
+		//DOn't turn this off as usually this is disabled. Allow the player switch to do that. 
+		//TurnOffDominantHand();		
+	}
 	public void SetupMeleeWeapon(string weapon_name)
     {
 		Logs.WriteInfo("SetupMeleeWeapon");
@@ -444,6 +490,12 @@ internal class VRPlayerController : MonoBehaviour
 		{
 			weapon.localEulerAngles = new Vector3(270f, 350f, 0f);
 			weapon.localPosition = new Vector3(0f, 0f, -0.1f);
+		}
+		else if (weapon_name.ToLower().Equals("hammer_pivot") ||
+			weapon_name.ToLower().Equals("hammer_pivot(clone)"))
+		{
+			weapon.localPosition = new Vector3(0f, 0f, -0.15f);
+			weapon.localScale = new Vector3(0.25f, 0.25f, 0.25f);
 		}
 		else if (weapon_name.ToLower().Equals("holdable_inkblob") ||
 			weapon_name.ToLower().Equals("holdable_inkblob(clone)"))
@@ -577,6 +629,24 @@ internal class VRPlayerController : MonoBehaviour
 		return false;
 	}
 
+	public bool TryGetDominantHandNodeStateAngularVelocity(out Vector3 velocity)
+	{
+		InputTracking.GetNodeStates(nodeStatesCache);
+		for (int i = 0; i < nodeStatesCache.Count; i++)
+		{
+			XRNodeState nodeState = nodeStatesCache[i];
+			if ((VrSettings.LeftHandedMode.Value == true && nodeState.nodeType == XRNode.LeftHand) ||
+				(VrSettings.LeftHandedMode.Value == false && nodeState.nodeType == XRNode.RightHand))
+			{
+				if (nodeState.TryGetAngularVelocity(out velocity))
+					return true;
+			}
+		}
+		// This is the fail case, where there was no hand available.
+		velocity = new Vector3();
+		return false;
+	}
+
 
 	private void Update()
 	{
@@ -606,10 +676,25 @@ internal class VRPlayerController : MonoBehaviour
 			//Intereaction Based on where laser is....
 			mPlayerController.m_Interaction.UpdateInteraction(mLaser.transform.position, mLaser.transform.forward);			
 			
+			
 			if (mPlayerController.m_CanHaveSeeingTool && mPlayerController.m_CharacterController.isGrounded && mPlayerController.CurrentStatus != CombatStatus.Hiding && !mPlayerController.isLocked && mPlayerController.m_IsSeeingToolEnabled && PlayerInput.SeeingTool())
 			{
 				mPlayerController.isSeeingToolActive = !mPlayerController.isSeeingToolActive;
 				mPlayerController.UseSeeingTool(mPlayerController.isSeeingToolActive);
+			}
+			else if(PlayerInput.SeeingTool())
+			{
+				Logs.WriteInfo("Wanted SeeingTool but can't have because ");
+				if(!mPlayerController.m_CanHaveSeeingTool)
+					Logs.WriteInfo("mPlayerController.m_CanHaveSeeingTool is false");
+				if(!mPlayerController.m_CharacterController.isGrounded)
+					Logs.WriteInfo("m_CharacterController.isGrounded is false");
+				if(mPlayerController.CurrentStatus == CombatStatus.Hiding)
+					Logs.WriteInfo("mPlayerController.CurrentStatus is hidding");
+				if(mPlayerController.isLocked)
+					Logs.WriteInfo("mPlayerController is locked");
+				if(!mPlayerController.m_IsSeeingToolEnabled)
+					Logs.WriteInfo("m_IsSeeingToolEnabled is not enbaled");
 			}
 
 			//Velocity Based Attacks
@@ -893,10 +978,12 @@ internal class VRPlayerController : MonoBehaviour
 		}
 		if (mPlayerController.m_CharacterController.enabled)
 		{
-			mPlayerController.m_CharacterController.Move(mPlayerController.m_MoveDir * Time.fixedDeltaTime + Vector3.up * mPlayerController.m_GravityPower);
-
 			//Move room dampenener here.
 			AdjustRoomDampener();
+
+			//TODO Need to combine these two into one movement call
+			mPlayerController.m_CharacterController.Move(mPlayerController.m_MoveDir * Time.fixedDeltaTime + Vector3.up * mPlayerController.m_GravityPower);
+			
 		}
 		if (!mPlayerController.m_CharacterController.isGrounded)
 		{

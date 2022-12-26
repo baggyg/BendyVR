@@ -15,7 +15,17 @@ namespace BendyVR_5.UI.Patches;
 public class UIPatches : BendyVRPatch
 {
     private static readonly Dictionary<string, Material> materialMap = new();
-    
+
+    //Loading Screen Fix
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(GenericLoaderController), nameof(GenericLoaderController.InitController))]
+    private static void IncreaseBlocker(GenericLoaderController __instance)
+    {
+        Transform blocker = __instance.transform.Find("Visuals/Blocker");
+        if(blocker)
+            blocker.localScale = new Vector3(5f,5f,5f);
+    }
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(BaseUIController), nameof(BaseUIController.InitController))]
     private static void UniformResizeHUD(BaseUIController __instance)

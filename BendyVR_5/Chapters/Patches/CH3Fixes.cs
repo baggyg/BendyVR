@@ -17,6 +17,27 @@ namespace BendyVR_5.Chapters.Patches;
 public class CH3Fixes : BendyVRPatch
 {
 	[HarmonyPrefix]
+	[HarmonyPatch(typeof(CH3OpeningSequenceController), nameof(CH3OpeningSequenceController.InternalActivate))]
+	private static bool InternalActivate(CH3OpeningSequenceController __instance)
+	{
+		//__instance.m_GameCamTransform = GameManager.Instance.GameCamera.InitializeFreeRoamCam();
+		//__instance.m_GameCamTransform.position = __instance.m_BedPosition.position;
+		//__instance.m_GameCamTransform.eulerAngles = __instance.m_BedPosition.eulerAngles;
+		GameManager.Instance.ShowChapterTitle("MENU/CH3_LABEL", "MENU/CH3_TITLE");
+		GameManager.Instance.HideScreenBlocker(1f);
+		//__instance.DOSequence();
+		//GameManager.Instance.GameCamera.ExitFreeRoamCam();
+		GameManager.Instance.Player.SetLock(active: false);
+		GameManager.Instance.UnlockPause();
+		//GameManager.Instance.Player.SetCameraSway(active: true);
+		//GameManager.Instance.ShowCrosshair();
+		GameManager.Instance.ShowObjective(ObjectiveDataVO.Create("OBJECTIVES/NEW_OBJECTIVE_HEADER", "OBJECTIVES/CH3_OBJECTIVE_01", string.Empty, 4f));
+		__instance.SendOnComplete();
+		return false;
+	}	
+	
+
+	[HarmonyPrefix]
 	[HarmonyPatch(typeof(CH3WeaponStationController), nameof(CH3WeaponStationController.HandleDropboxOnInteracted))]
 	private static bool FixWeaponSwitch(CH3WeaponStationController __instance)
 	{

@@ -30,10 +30,12 @@ public class MainMenuPatches : BendyVRPatch
 	[HarmonyPatch(typeof(BaseUIController), nameof(BaseUIController.InitController))]
 	private static void RemoveCustomInput(BaseUIController __instance)
 	{
-		__instance.gameObject.GetComponent<GraphicRaycaster>().enabled = false;		
-	}
+        GraphicRaycaster gr = __instance.gameObject.GetComponent<GraphicRaycaster>();
+        if (gr != null)
+            gr.enabled = false;
+    }
 
-	[HarmonyPostfix]
+    [HarmonyPostfix]
 	[HarmonyPatch(typeof(OptionsMenuController), nameof(OptionsMenuController.InitController))]
 	private static void RemoveCustomInput(TitleScreenController __instance)
 	{
@@ -92,6 +94,10 @@ public class MainMenuPatches : BendyVRPatch
         if (__instance is ScreenBlockerController)
         {
             CanvasToWorldSpace.MoveToCameraSpace(__instance,1f);        
+        }
+        else if (__instance is CH1ConclusionModalController)
+        {
+            CanvasToWorldSpace.MoveToCameraSpace(__instance, 2f);
         }
         else if (__instance is HurtBordersController)
         {

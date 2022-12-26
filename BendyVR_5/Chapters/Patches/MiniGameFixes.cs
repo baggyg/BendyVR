@@ -34,6 +34,10 @@ public class MiniGameFixes : BendyVRPatch
         {
             vrPlayerController.SetupGunWeapon(__instance.HeldObject.name);
         }		
+		else if(__instance is Minigame_Hammer)
+        {
+			vrPlayerController.SetupMeleeWeapon(__instance.HeldObject.name);
+		}
 
 		/*LineRenderer lineRenderer = __instance.HeldObject.gameObject.AddComponent<LineRenderer>();
         lineRenderer.useWorldSpace = false;
@@ -63,6 +67,149 @@ public class MiniGameFixes : BendyVRPatch
 	}
 
 	[HarmonyPrefix]
+	[HarmonyPatch(typeof(WinnableMiniGameBaseController), nameof(WinnableMiniGameBaseController.HandleBeginGame))]
+	public static void PrepareColliders(WinnableMiniGameBaseController __instance)
+	{
+		if(__instance is Minigame_Hammer)
+        {
+			//Find the something in the scene
+			Transform bell_bottom = GameObject.Find("Bell_Bottom").transform;
+			Transform elementParent = bell_bottom.GetParent();
+			
+			//Remove the collision 
+			Transform collision = elementParent.Find("Collision");
+			collision.gameObject.SetActive(false);
+			Logs.WriteWarning("Collision Turned Off");
+
+			//Add a collision on the button
+			Transform button1 = elementParent.Find("Button");
+			Transform button = button1.Find("FairGameHammerButton");
+			button.gameObject.AddComponent<BoxCollider>();
+			Logs.WriteWarning("BoxCollider Added");
+		}
+	}
+
+	[HarmonyPrefix]
+	[HarmonyPatch(typeof(Minigame_Hammer), nameof(Minigame_Hammer.Update))]
+	public static bool HammerHit(Minigame_Hammer __instance)
+	{
+		/// BASE UPDATE ///
+		if (!GameManager.Instance.isPaused && (!GameManager.Instance.Player || GameManager.Instance.Player.CurrentStatus == CombatStatus.Hiding) && (__instance.CurrentState == WinnableMiniGameBaseController.MiniGameState.ACTIVE || __instance.CurrentState == WinnableMiniGameBaseController.MiniGameState.PREPPING) && __instance.CurrentState == WinnableMiniGameBaseController.MiniGameState.ACTIVE)
+		{
+			if (PlayerInput.InteractOnPressed())
+			{
+				__instance.CurrentState = WinnableMiniGameBaseController.MiniGameState.INACTIVE;
+				__instance.ForceExitGame();
+			}
+			__instance.m_CharacterLook.GetInput();
+		}
+		/// END BASE UPDATE ///
+		if (__instance.CurrentState == WinnableMiniGameBaseController.MiniGameState.ACTIVE && __instance.m_GameReset)
+		{
+			
+			//UnityEngine.Object.Destroy(__instance.HeldObject.GetComponent<Collider>());
+			/*
+			m_TimeSinceStart += Time.deltaTime;
+			m_HammerStrength = 0.5f * (1f + Mathf.Sin(6.28f * m_TimeSinceStart));
+			base.HeldObject.localRotation = Quaternion.Euler(-35f * m_HammerStrength, 0f, 0f);
+			if (PlayerInput.Attack())
+			{
+				m_CurrentTry++;
+				m_ClickValue = m_HammerStrength;
+				m_GameReset = false;
+				DOHammerHit();
+			}*/
+			Transform transform =__instance.HeldObject;
+			
+			int layerMask = ~LayerMask.GetMask("Audio");
+			if (Physics.SphereCast(transform.position + (transform.rotation * new Vector3(0f, 0f, 2.5f)), 0.5f, -transform.up, out var hitInfo, 0.5f, layerMask))
+			{
+				Logs.WriteInfo("HIT " + hitInfo.transform.name + " " + hitInfo.transform.GetParent().name);
+
+				/*GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+				sphere.transform.position = transform.position + (transform.rotation * new Vector3(0f, 0f, 2.5f));
+				sphere.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+				UnityEngine.Object.Destroy(sphere.GetComponent<Collider>());
+            
+				GameObject sphere2 = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+				sphere2.transform.position = hitInfo.point;
+				sphere2.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+				UnityEngine.Object.Destroy(sphere2.GetComponent<Collider>());
+				var renderer = sphere2.GetComponent<MeshRenderer>();
+				renderer.material.SetColor("_Color", Color.green);
+            
+				UnityEngine.Object.Destroy(sphere, 3f);
+				UnityEngine.Object.Destroy(sphere2, 3f);*/
+
+				if(hitInfo.transform.name.Equals("FairGameHammerButton"))
+                {
+					__instance.m_CurrentTry++;
+					VrCore.instance.GetVRPlayerController().TryGetDominantHandNodeStateAngularVelocity(out Vector3 angularVelocity);
+					//__instance.m_ClickValue = __instance.m_HammerStrength;
+					__instance.m_ClickValue = angularVelocity.magnitude + 0.2f;
+					Logs.WriteWarning("Velocity = " + angularVelocity.magnitude);
+
+					//Theoretical Maximum = 1f
+					//0.5f * (1f + Mathf.Sin(6.28f * m_TimeSinceStart))
+					if (__instance.m_ClickValue > 1)
+						__instance.m_ClickValue = 1;
+					
+					__instance.m_GameReset = false;
+					__instance.DOHammerHit();
+				}
+				/*if (hitInfo.collider.gameObject.Equals(base.gameObject))
+				{
+					m_IsFlashing = true;
+					DOFlash().OnComplete(DisableFlash);
+				}*/
+			}
+		}
+		return false;
+	}
+
+	[HarmonyPrefix]
+	[HarmonyPatch(typeof(Minigame_Hammer), nameof(Minigame_Hammer.DOHammerHit))]
+	public static bool HammerHitVR(Minigame_Hammer __instance)
+	{
+		if (__instance.CurrentState == WinnableMiniGameBaseController.MiniGameState.ACTIVE)
+		{
+			float num = 0.5f * __instance.m_ClickValue + 0.1f;
+			Vector3 endValue = Vector3.Lerp(__instance.m_BellBottom.localPosition, __instance.m_BellTop.localPosition, __instance.m_ClickValue);
+			Sequence sequence = DOTween.Sequence();
+			float num2 = 0f;
+			/*sequence.Insert(num2, base.HeldObject.DOLocalRotate(new Vector3(90f, 0f, 0f), 0.2f).SetEase(Ease.InQuad));
+			sequence.InsertCallback(num2, delegate
+			{
+				__instance.m_AudioSwitch.Play("swing");
+			});
+			num2 += 0.2f;
+			//sequence.Insert(num2, base.HeldObject.DOLocalRotate(new Vector3(-35f * m_ClickValue, 0f, 0f), 0.3f).SetEase(Ease.InOutQuad));*/
+			sequence.InsertCallback(num2, delegate
+			{
+				__instance.m_AudioSwitch.Play("hit");
+			});
+			sequence.Insert(num2, __instance.m_Bell.DOLocalMove(endValue, num).SetEase(Ease.OutQuad));
+			sequence.InsertCallback(num2, delegate
+			{
+				__instance.m_AudioSwitch.Play("slide");
+			});
+			sequence.Insert(num2, __instance.m_Button.DOLocalMoveY(0f - __instance.m_ClickValue, 0.15f).SetEase(Ease.Linear));
+			sequence.Insert(num2 + 0.15f, __instance.m_Button.DOLocalMoveY(0f, 0.5f).SetEase(Ease.InOutQuad));
+			num2 += num;
+			sequence.InsertCallback(num2, __instance.CheckBellHit);
+			sequence.Insert(num2, __instance.m_Bell.DOLocalMove(__instance.m_BellBottom.localPosition, num).SetEase(Ease.InQuad));
+			num2 += num;
+			sequence.InsertCallback(num2 - 0.1f, delegate
+			{
+				__instance.m_AudioSwitch.Play("reset");
+			});
+			sequence.OnComplete(__instance.CheckBellWinAndReset);
+		}
+		return false;
+	}
+
+
+		[HarmonyPrefix]
 	[HarmonyPatch(typeof(Minigame_BallToss), nameof(Minigame_BallToss.Update))]
 	public static bool UpdateBallToss(Minigame_BallToss __instance)
 	{

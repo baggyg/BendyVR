@@ -15,65 +15,7 @@ namespace BendyVR_5.Chapters.Patches;
 [HarmonyPatch]
 public class CH2Fixes : BendyVRPatch
 {
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(CH2RitualRoomController), nameof(CH2RitualRoomController.ForceComplete))]
-    private static bool VRCH2RitualRoomControllerComplete(CH2RitualRoomController __instance)
-    {
-        GameManager.Instance.UpdateObjective(ObjectiveDataVO.Create("OBJECTIVES/CURRENT_OBJECTIVE_HEADER", "OBJECTIVES/OBJECTIVE_FIND_A_NEW_EXIT", string.Empty));
-        GameManager.Instance.Player.WeaponGameObject = __instance.m_Axe.gameObject;
-        GameManager.Instance.Player.EquipWeapon();
-        if ((bool)__instance.m_Axe && __instance.m_Axe.Interaction != null)
-        {
-            __instance.m_Axe.Interaction.SetActive(active: false);
-        }
-        __instance.m_Axe.KillInteraction();
-        __instance.m_Axe.Equip();
-
-        __instance.m_Plank.gameObject.SetActive(value: false);
-        __instance.m_ScarePlank.gameObject.SetActive(value: false);
-        __instance.m_Door.ForceOpen(145f);
-        __instance.m_Door.Lock();
-        __instance.SendOnComplete();
-
-        return false;
-    }
-
-    //Get rid of VR nausea simulator (CH2 Opening)
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(CH2OpeningSequenceController), nameof(CH2OpeningSequenceController.DOGetUpSequence))]
-    private static bool DontGetUp(CH2OpeningSequenceController __instance, ref Sequence __result)
-    {
-        Sequence sequence = DOTween.Sequence();
-        float num = 1f;
-        sequence.InsertCallback(num, delegate
-        {
-            __instance.m_GameCam.Camera.transform.SetParent(GameManager.Instance.Player.CameraParent);
-        });
-        sequence.InsertCallback(num += 0.5f, __instance.PlayIntroDialogue_02);
-        __result = sequence;
-        return false;
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(CH2ClosingSequenceController), nameof(CH2ClosingSequenceController.HandleFinalTriggerOnEnter))]
-    private static bool VRHandleFinalTriggerOnEnter(CH2ClosingSequenceController __instance)
-    {
-        __instance.m_FinalTrigger.OnEnter -= __instance.HandleFinalTriggerOnEnter;
-        GameManager.Instance.HideCrosshair();
-        GameManager.Instance.LockPause();
-        GameManager.Instance.Player.SetCameraSway(active: true);
-        GameManager.Instance.Player.SetLock(active: true);
-        //GameManager.Instance.Player.HeadContainer.DOLookAt(__instance.m_FinalLookAt.position, 2f).SetEase(Ease.InOutQuad);
-        //VrCore.instance.GetVRPlayerController().mNewCameraParent.DOLookAt(__instance.m_FinalLookAt.position, 2f).SetEase(Ease.InOutQuad);        
-
-        //TODO Might remove this completely - since if they turn around physically it will be off. 
-        VrCore.instance.GetVRPlayerController().mPlayerController.transform.DOLookAt(__instance.m_FinalLookAt.position, 2f).SetEase(Ease.InOutQuad);
-        GameManager.Instance.AudioManager.Play(__instance.m_CanKickClip);
-        __instance.DOSequence().OnComplete(__instance.SequenceOnComplete);
-        return false;
-    }
-
-	[HarmonyPrefix]
+	/*[HarmonyPrefix]
 	[HarmonyPatch(typeof(CH2OpeningSequenceController), nameof(CH2OpeningSequenceController.DOOpeningSequence))]
 	public static bool CH2OpeningFix(CH2OpeningSequenceController __instance, ref Sequence __result)
 	{
@@ -172,7 +114,104 @@ public class CH2Fixes : BendyVRPatch
 		});
 
 		return false;
+	}*/
+
+	[HarmonyPrefix]
+	[HarmonyPatch(typeof(CH2OpeningSequenceController), nameof(CH2OpeningSequenceController.Activate))]
+	public static bool VRActivateOpening(CH2OpeningSequenceController __instance)
+	{
+		if (GameManager.Instance.GameData.CurrentSaveFile.CH2Data.RitualObjective.IsComplete)
+		{
+			__instance.ForceComplete();
+			return false;
+		}
+		__instance.m_GameCam = GameManager.Instance.GameCamera;
+		/*m_GameCamTransform = GameManager.Instance.GameCamera.InitializeFreeRoamCam();
+		m_GameCamTransform.position = m_StartPosition.position;
+		m_GameCamTransform.eulerAngles = m_StartPosition.eulerAngles;*/
+		if (__instance.m_GameCam.DoF)
+		{
+			__instance.m_GameCam.UnityDOF.manualDOF = true;
+			__instance.m_GameCam.UnityDOF.focalDistance = 0f;
+		}
+		__instance.DOOpeningSequence();
+		return false;
 	}
+
+	//Get rid of VR nausea simulator (CH2 Opening)
+	[HarmonyPrefix]
+	[HarmonyPatch(typeof(CH2OpeningSequenceController), nameof(CH2OpeningSequenceController.DOGetUpSequence))]
+	private static bool DontGetUp(CH2OpeningSequenceController __instance, ref Sequence __result)
+	{
+		Sequence sequence = DOTween.Sequence();
+		float num = 1f;
+		/*sequence.InsertCallback(num, delegate
+		{
+			__instance.m_GameCam.Camera.transform.SetParent(GameManager.Instance.Player.CameraParent);
+		});*/
+		sequence.InsertCallback(num += 0.5f, __instance.PlayIntroDialogue_02);
+		__result = sequence;
+		return false;
+	}
+
+	[HarmonyPrefix]
+	[HarmonyPatch(typeof(CH2OpeningSequenceController), nameof(CH2OpeningSequenceController.GetUpSequenceOnComplete))]
+	public static bool DontGetUpOnComplete(CH2OpeningSequenceController __instance)
+	{
+		//GameManager.Instance.GameCamera.ExitFreeRoamCam();
+		__instance.PlayIntroDialogue_03();
+		GameManager.Instance.Player.SetLock(active: false);
+		GameManager.Instance.UnlockPause();
+		GameManager.Instance.Player.SetInteraction(active: true);
+		GameManager.Instance.Player.SetCameraSway(active: true);
+		return false;
+	}
+
+	[HarmonyPrefix]
+    [HarmonyPatch(typeof(CH2RitualRoomController), nameof(CH2RitualRoomController.ForceComplete))]
+    private static bool VRCH2RitualRoomControllerComplete(CH2RitualRoomController __instance)
+    {
+        GameManager.Instance.UpdateObjective(ObjectiveDataVO.Create("OBJECTIVES/CURRENT_OBJECTIVE_HEADER", "OBJECTIVES/OBJECTIVE_FIND_A_NEW_EXIT", string.Empty));
+        GameManager.Instance.Player.WeaponGameObject = __instance.m_Axe.gameObject;
+        GameManager.Instance.Player.EquipWeapon();
+        if ((bool)__instance.m_Axe && __instance.m_Axe.Interaction != null)
+        {
+            __instance.m_Axe.Interaction.SetActive(active: false);
+        }
+        __instance.m_Axe.KillInteraction();
+        __instance.m_Axe.Equip();
+
+        __instance.m_Plank.gameObject.SetActive(value: false);
+        __instance.m_ScarePlank.gameObject.SetActive(value: false);
+        __instance.m_Door.ForceOpen(145f);
+        __instance.m_Door.Lock();
+        __instance.SendOnComplete();
+
+        return false;
+    }
+
+    
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(CH2ClosingSequenceController), nameof(CH2ClosingSequenceController.HandleFinalTriggerOnEnter))]
+    private static bool VRHandleFinalTriggerOnEnter(CH2ClosingSequenceController __instance)
+    {
+        __instance.m_FinalTrigger.OnEnter -= __instance.HandleFinalTriggerOnEnter;
+        GameManager.Instance.HideCrosshair();
+        GameManager.Instance.LockPause();
+        GameManager.Instance.Player.SetCameraSway(active: true);
+        GameManager.Instance.Player.SetLock(active: true);
+        //GameManager.Instance.Player.HeadContainer.DOLookAt(__instance.m_FinalLookAt.position, 2f).SetEase(Ease.InOutQuad);
+        //VrCore.instance.GetVRPlayerController().mNewCameraParent.DOLookAt(__instance.m_FinalLookAt.position, 2f).SetEase(Ease.InOutQuad);        
+
+        //TODO Might remove this completely - since if they turn around physically it will be off. 
+        VrCore.instance.GetVRPlayerController().mPlayerController.transform.DOLookAt(__instance.m_FinalLookAt.position, 2f).SetEase(Ease.InOutQuad);
+        GameManager.Instance.AudioManager.Play(__instance.m_CanKickClip);
+        __instance.DOSequence().OnComplete(__instance.SequenceOnComplete);
+        return false;
+    }
+
+	
 
 	[HarmonyPrefix]
 	[HarmonyPatch(typeof(CH2BendyChaseController), nameof(CH2BendyChaseController.HandleBendyOnEntered))]

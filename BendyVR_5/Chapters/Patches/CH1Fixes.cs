@@ -18,8 +18,8 @@ public class CH1Fixes : BendyVRPatch
 	[HarmonyPatch(typeof(CH1BendyFinaleController), nameof(CH1BendyFinaleController.Update))]
 	private static bool FixBendyEncounter(CH1BendyFinaleController __instance)
 	{
-		if (__instance.m_CanScare && !__instance.m_InkMachineMeshRenderer.isVisible)
-			Logs.WriteInfo("Can't See the Ink Machine!!!");
+		//if (__instance.m_CanScare && !__instance.m_InkMachineMeshRenderer.isVisible)
+		//	Logs.WriteInfo("Can't See the Ink Machine!!!");
 
 		if (__instance.m_ShowRunTutorial && PlayerInput.Run())
 		{
@@ -90,10 +90,16 @@ public class CH1Fixes : BendyVRPatch
 	}
 
 	[HarmonyPrefix]
-	[HarmonyPatch(typeof(CH1ConclusionModalController), nameof(CH1ConclusionModalController.ShowImage))]
-	private static bool DontShowImage()
+	[HarmonyPatch(typeof(CH1FinaleController), nameof(CH1FinaleController.HandleAxeOnEquipped))]
+	private static bool DontShowTutorial(CH1FinaleController __instance)
 	{
-		//These are currently broken anyway so don't show them
+		//GameManager.Instance.ShowTutorial(new TutorialDataVO("Tutorial/TUTORIAL_ATTACK"));
+		//m_ShowAttackTutorial = true;
+		GameManager.Instance.ShowDialogue(DialogueDataVO.Create(__instance.m_HenryClip07, "DIACH1/DIA_CH1_HENRY_07"));
+		for (int i = 0; i < __instance.m_Breakables.Count; i++)
+		{
+			__instance.m_Breakables[i].OnBroken += __instance.HandleOnBroken;
+		}
 		return false;
 	}
 }
