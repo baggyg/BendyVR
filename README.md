@@ -1,6 +1,6 @@
 # ![Bendy VR](https://github.com/baggyg/BendyVR/blob/main/WebsiteAssets/BendyVRGithub.jpg)
 
-Bendy VR is a VR mod for [Bendy and the Ink Machine](https://store.steampowered.com/app/622650/Bendy_and_the_Ink_Machine/), with full motion control support. This is Team Beef's very first PCVR mod. I would firstly like to thank Raicuparta. Its fair to say eithe BendyVR would not have existed without his VR mods, or would have certainly taken a long time to create. Quite a few systems are based upon his work, including the Installer. Raicuparta has a slew of his own VR mods which you can browse [on his website](https://raicuparta.com/). 
+Bendy VR is a VR mod for [Bendy and the Ink Machine](https://store.steampowered.com/app/622650/Bendy_and_the_Ink_Machine/), with full motion control support. This is Team Beef's very first PCVR mod. I would firstly like to thank Raicuparta. Its fair to say that either BendyVR would not have existed without his VR mods or would have certainly taken a long time to create. Quite a few systems are based upon or using  his work, including the Installer. Raicuparta has a slew of his own VR mods which you can browse [on his website](https://raicuparta.com/). 
 
 Secondly I would like to thank all of our patrons for supporting us. Without this support the VR mods we are working on would simply not be possible. If you like what we are doing, want to suggest and vote on new ports and get access to in-development versions please click the banner below
 
