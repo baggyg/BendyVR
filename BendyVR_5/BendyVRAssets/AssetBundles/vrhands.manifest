@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 3096236450
+CRC: 2442546518
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 339a8aad2d8aa3043b140eab644810e4
+    Hash: e97711b33ca13c0ed35519ed21e54bac
   TypeTreeHash:
     serializedVersion: 2
     Hash: ce28056b625f1caf531d104f6545413d
@@ -43,6 +43,8 @@ ClassTypes:
   Script: {instanceID: 0}
 Assets:
 - Assets/AssetBundles/VRHands/vr_glove_left.prefab
-- Assets/AssetBundles/VRHands/vr_glove_right.prefab
+- Assets/AssetBundles/VRHands/vr_glove_right_bkp.prefab
 - Assets/AssetBundles/VRHands/menu_bg.jpg
+- Assets/AssetBundles/VRHands/vr_glove_right.prefab
+- Assets/AssetBundles/VRHands/vr_glove_left_bkp.prefab
 Dependencies: []

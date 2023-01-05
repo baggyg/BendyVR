@@ -1,0 +1,131 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETFramework,Version=v3.5": {
+      "AssetsTools.NET/2.0.9": {
+        "type": "package",
+        "dependencies": {
+          "Mono.Cecil": "0.10.4"
+        },
+        "compile": {
+          "lib/net35/AssetsTools.NET.dll": {}
+        },
+        "runtime": {
+          "lib/net35/AssetsTools.NET.dll": {}
+        }
+      },
+      "Mono.Cecil/0.10.4": {
+        "type": "package",
+        "compile": {
+          "lib/net35/Mono.Cecil.Mdb.dll": {},
+          "lib/net35/Mono.Cecil.Pdb.dll": {},
+          "lib/net35/Mono.Cecil.Rocks.dll": {},
+          "lib/net35/Mono.Cecil.dll": {}
+        },
+        "runtime": {
+          "lib/net35/_._": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "AssetsTools.NET/2.0.9": {
+      "sha512": "gG87LmRhqRCc/rlu32Y+YsRYiDPPhGqSFDzzPVlHlsRVCh16M9qYNDwI/RcdGdpmGadnLgxBp+7bMflwZetgKw==",
+      "type": "package",
+      "path": "assetstools.net/2.0.9",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "assetstools.net.2.0.9.nupkg.sha512",
+        "assetstools.net.nuspec",
+        "icon.png",
+        "lib/net35/AssetsTools.NET.dll",
+        "lib/net40/AssetsTools.NET.dll",
+        "lib/netstandard2.0/AssetsTools.NET.dll"
+      ]
+    },
+    "Mono.Cecil/0.10.4": {
+      "sha512": "BHukPf7zfXu+akTcFEAWvU4x3hVMMIDC+ihGAl/+8OozrY0f/ajrpuaSUf2Q3Xvgsge5NryvOkjtyhV5TNXoSg==",
+      "type": "package",
+      "path": "mono.cecil/0.10.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net35/Mono.Cecil.Mdb.dll",
+        "lib/net35/Mono.Cecil.Pdb.dll",
+        "lib/net35/Mono.Cecil.Rocks.dll",
+        "lib/net35/Mono.Cecil.dll",
+        "lib/net40/Mono.Cecil.Mdb.dll",
+        "lib/net40/Mono.Cecil.Pdb.dll",
+        "lib/net40/Mono.Cecil.Rocks.dll",
+        "lib/net40/Mono.Cecil.dll",
+        "lib/netstandard1.3/Mono.Cecil.Mdb.dll",
+        "lib/netstandard1.3/Mono.Cecil.Pdb.dll",
+        "lib/netstandard1.3/Mono.Cecil.Rocks.dll",
+        "lib/netstandard1.3/Mono.Cecil.dll",
+        "mono.cecil.0.10.4.nupkg.sha512",
+        "mono.cecil.nuspec"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETFramework,Version=v3.5": [
+      "AssetsTools.NET >= 2.0.9",
+      "Mono.Cecil >= 0.10.4"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\baggyg\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "F:\\VRUnityModding\\BendyVR\\BendyVRPatcher\\BendyVRPatcher.csproj",
+      "projectName": "BendyVRPatcher",
+      "projectPath": "F:\\VRUnityModding\\BendyVR\\BendyVRPatcher\\BendyVRPatcher.csproj",
+      "packagesPath": "C:\\Users\\baggyg\\.nuget\\packages\\",
+      "outputPath": "F:\\VRUnityModding\\BendyVR\\BendyVRPatcher\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\baggyg\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net35"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "https://api.nuget.org/v3/index.json": {},
+        "https://nuget.bepinex.dev/v3/index.json": {}
+      },
+      "frameworks": {
+        "net35": {
+          "targetAlias": "net35",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net35": {
+        "targetAlias": "net35",
+        "dependencies": {
+          "AssetsTools.NET": {
+            "target": "Package",
+            "version": "[2.0.9, )"
+          },
+          "Mono.Cecil": {
+            "include": "Compile",
+            "target": "Package",
+            "version": "[0.10.4, )"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.307\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

@@ -1,348 +1,366 @@
 {
-  "action_manifest_version": 0,
-  "alias_info": {},
-  "app_key": "steam.app.622650",
-  "bindings": {
-    "/actions/buggy": {
-      "chords": [],
-      "haptics": [],
-      "poses": [],
-      "skeleton": [],
-      "sources": []
-    },
-    "/actions/default": {
-      "chords": [],
-      "haptics": [
-        {
-          "output": "/actions/default/out/haptic",
-          "path": "/user/hand/left/output/haptic"
-        },
-        {
-          "output": "/actions/default/out/haptic",
-          "path": "/user/hand/right/output/haptic"
-        }
-      ],
-      "poses": [
-        {
-          "output": "/actions/default/in/poselefthand",
-          "path": "/user/hand/left/pose/raw"
-        },
-        {
-          "output": "/actions/default/in/poserighthand",
-          "path": "/user/hand/right/pose/raw"
-        }
-      ],
-      "skeleton": [
-        {
-          "output": "/actions/default/in/skeletonlefthand",
-          "path": "/user/hand/left/input/skeleton/left"
-        },
-        {
-          "output": "/actions/default/in/skeletonrighthand",
-          "path": "/user/hand/right/input/skeleton/right"
-        }
-      ],
-      "sources": []
-    },
-    "/actions/dominanthand": {
-      "sources": [
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/dominanthand/in/interact"
-            }
-          },
-          "mode": "button",
-          "path": "/user/hand/right/input/b"
-        },
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/dominanthand/in/interact"
-            }
-          },
-          "mode": "button",
-          "path": "/user/hand/left/input/b"
-        },
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/dominanthand/in/weapon"
-            }
-          },
-          "mode": "trigger",
-          "path": "/user/hand/right/input/trigger"
-        },
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/dominanthand/in/weapon"
-            }
-          },
-          "mode": "trigger",
-          "path": "/user/hand/left/input/trigger"
-        }
-      ]
-    },
-    "/actions/movementhand": {
-      "sources": [
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/movementhand/in/run"
+   "action_manifest_version" : 0,
+   "alias_info" : {},
+   "app_key" : "steam.app.622650",
+   "bindings" : {
+      "/actions/buggy" : {
+         "chords" : [],
+         "haptics" : [],
+         "poses" : [],
+         "skeleton" : [],
+         "sources" : []
+      },
+      "/actions/default" : {
+         "chords" : [],
+         "haptics" : [
+            {
+               "output" : "/actions/default/out/haptic",
+               "path" : "/user/hand/left/output/haptic"
             },
-            "position": {
-              "output": "/actions/movementhand/in/move"
+            {
+               "output" : "/actions/default/out/haptic",
+               "path" : "/user/hand/right/output/haptic"
             }
-          },
-          "mode": "joystick",
-          "path": "/user/hand/left/input/thumbstick"
-        },
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/movementhand/in/run"
+         ],
+         "poses" : [
+            {
+               "output" : "/actions/default/in/poselefthand",
+               "path" : "/user/hand/left/pose/raw"
             },
-            "position": {
-              "output": "/actions/movementhand/in/move"
+            {
+               "output" : "/actions/default/in/poserighthand",
+               "path" : "/user/hand/right/pose/raw"
             }
-          },
-          "mode": "joystick",
-          "path": "/user/hand/right/input/thumbstick"
-        },
-        {
-          "inputs": {
-            "north": {
-              "output": "/actions/movementhand/in/teleport"
-            }
-          },
-          "mode": "dpad",
-          "parameters": {
-            "sub_mode": "click"
-          },
-          "path": "/user/hand/left/input/trackpad"
-        },
-        {
-          "inputs": {
-            "north": {
-              "output": "/actions/movementhand/in/teleport"
-            }
-          },
-          "mode": "dpad",
-          "parameters": {
-            "sub_mode": "click"
-          },
-          "path": "/user/hand/right/input/trackpad"
-        }
-      ]
-    },
-    "/actions/nondominanthand": {
-      "sources": [
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/nondominanthand/in/pause"
-            }
-          },
-          "mode": "button",
-          "path": "/user/hand/left/input/b"
-        },
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/nondominanthand/in/pause"
-            }
-          },
-          "mode": "button",
-          "path": "/user/hand/right/input/b"
-        },
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/nondominanthand/in/seeingtool"
-            }
-          },
-          "mode": "trigger",
-          "path": "/user/hand/left/input/trigger"
-        },
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/nondominanthand/in/seeingtool"
-            }
-          },
-          "mode": "trigger",
-          "path": "/user/hand/right/input/trigger"
-        },
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/nondominanthand/in/expoinvert"
-            }
-          },
-          "mode": "button",
-          "path": "/user/hand/left/input/a"
-        },
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/nondominanthand/in/expoinvert"
-            }
-          },
-          "mode": "button",
-          "path": "/user/hand/right/input/a"
-        }
-      ]
-    },
-    "/actions/platformer": {
-      "chords": [],
-      "haptics": [],
-      "poses": [],
-      "skeleton": [],
-      "sources": []
-    },
-    "/actions/rotationhand": {
-      "sources": [
-        {
-          "inputs": {
-            "east": {
-              "output": "/actions/rotationhand/in/snapturnright"
+         ],
+         "skeleton" : [
+            {
+               "output" : "/actions/default/in/skeletonlefthand",
+               "path" : "/user/hand/left/input/skeleton/left"
             },
-            "north": {
-              "output": "/actions/rotationhand/in/uiup"
+            {
+               "output" : "/actions/default/in/skeletonrighthand",
+               "path" : "/user/hand/right/input/skeleton/right"
+            }
+         ],
+         "sources" : []
+      },
+      "/actions/dominanthand" : {
+         "sources" : [
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/dominanthand/in/seeingtool"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/b"
             },
-            "south": {
-              "output": "/actions/rotationhand/in/uidown"
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/dominanthand/in/seeingtool"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/left/input/b"
             },
-            "west": {
-              "output": "/actions/rotationhand/in/snapturnleft"
-            }
-          },
-          "mode": "dpad",
-          "parameters": {
-            "sub_mode": "touch"
-          },
-          "path": "/user/hand/left/input/thumbstick"
-        },
-        {
-          "inputs": {
-            "east": {
-              "output": "/actions/rotationhand/in/snapturnright"
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/dominanthand/in/weapon"
+                  }
+               },
+               "mode" : "trigger",
+               "path" : "/user/hand/right/input/trigger"
             },
-            "north": {
-              "output": "/actions/rotationhand/in/uiup"
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/dominanthand/in/weapon"
+                  }
+               },
+               "mode" : "trigger",
+               "path" : "/user/hand/left/input/trigger"
+            }
+         ]
+      },
+      "/actions/movementhand" : {
+         "sources" : [
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/movementhand/in/run"
+                  },
+                  "position" : {
+                     "output" : "/actions/movementhand/in/move"
+                  }
+               },
+               "mode" : "joystick",
+               "path" : "/user/hand/left/input/thumbstick"
             },
-            "south": {
-              "output": "/actions/rotationhand/in/uidown"
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/movementhand/in/run"
+                  },
+                  "position" : {
+                     "output" : "/actions/movementhand/in/move"
+                  }
+               },
+               "mode" : "joystick",
+               "path" : "/user/hand/right/input/thumbstick"
             },
-            "west": {
-              "output": "/actions/rotationhand/in/snapturnleft"
+            {
+               "inputs" : {
+                  "north" : {
+                     "output" : "/actions/movementhand/in/teleport"
+                  }
+               },
+               "mode" : "dpad",
+               "parameters" : {
+                  "sub_mode" : "click"
+               },
+               "path" : "/user/hand/left/input/trackpad"
+            },
+            {
+               "inputs" : {
+                  "north" : {
+                     "output" : "/actions/movementhand/in/teleport"
+                  }
+               },
+               "mode" : "dpad",
+               "parameters" : {
+                  "sub_mode" : "click"
+               },
+               "path" : "/user/hand/right/input/trackpad"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/movementhand/in/run"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/left/input/grip"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/movementhand/in/run"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/grip"
             }
-          },
-          "mode": "dpad",
-          "parameters": {
-            "sub_mode": "touch"
-          },
-          "path": "/user/hand/right/input/thumbstick"
-        },
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/rotationhand/in/previous"
+         ]
+      },
+      "/actions/nondominanthand" : {
+         "sources" : [
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/nondominanthand/in/pause"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/left/input/b"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/nondominanthand/in/pause"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/b"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/nondominanthand/in/interact"
+                  }
+               },
+               "mode" : "trigger",
+               "path" : "/user/hand/left/input/trigger"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/nondominanthand/in/interact"
+                  }
+               },
+               "mode" : "trigger",
+               "path" : "/user/hand/right/input/trigger"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/nondominanthand/in/expoinvert"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/left/input/a"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/nondominanthand/in/expoinvert"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/a"
             }
-          },
-          "mode": "button",
-          "path": "/user/hand/left/input/b"
-        },
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/rotationhand/in/previous"
+         ]
+      },
+      "/actions/platformer" : {
+         "chords" : [],
+         "haptics" : [],
+         "poses" : [],
+         "skeleton" : [],
+         "sources" : []
+      },
+      "/actions/rotationhand" : {
+         "sources" : [
+            {
+               "inputs" : {
+                  "east" : {
+                     "output" : "/actions/rotationhand/in/snapturnright"
+                  },
+                  "north" : {
+                     "output" : "/actions/rotationhand/in/uiup"
+                  },
+                  "south" : {
+                     "output" : "/actions/rotationhand/in/uidown"
+                  },
+                  "west" : {
+                     "output" : "/actions/rotationhand/in/snapturnleft"
+                  }
+               },
+               "mode" : "dpad",
+               "parameters" : {
+                  "sub_mode" : "touch"
+               },
+               "path" : "/user/hand/left/input/thumbstick"
+            },
+            {
+               "inputs" : {
+                  "east" : {
+                     "output" : "/actions/rotationhand/in/snapturnright"
+                  },
+                  "north" : {
+                     "output" : "/actions/rotationhand/in/uiup"
+                  },
+                  "south" : {
+                     "output" : "/actions/rotationhand/in/uidown"
+                  },
+                  "west" : {
+                     "output" : "/actions/rotationhand/in/snapturnleft"
+                  }
+               },
+               "mode" : "dpad",
+               "parameters" : {
+                  "sub_mode" : "touch"
+               },
+               "path" : "/user/hand/right/input/thumbstick"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/rotationhand/in/previous"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/left/input/b"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/rotationhand/in/previous"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/b"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/rotationhand/in/jump"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/left/input/a"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/rotationhand/in/jump"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/a"
+            },
+            {
+               "inputs" : {
+                  "position" : {
+                     "output" : "/actions/rotationhand/in/rotate"
+                  }
+               },
+               "mode" : "joystick",
+               "path" : "/user/hand/left/input/thumbstick"
+            },
+            {
+               "inputs" : {
+                  "position" : {
+                     "output" : "/actions/rotationhand/in/rotate"
+                  }
+               },
+               "mode" : "joystick",
+               "path" : "/user/hand/right/input/thumbstick"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/rotationhand/in/cancel"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/left/input/b"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/rotationhand/in/cancel"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/b"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/rotationhand/in/next"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/left/input/a"
+            },
+            {
+               "inputs" : {
+                  "click" : {
+                     "output" : "/actions/rotationhand/in/next"
+                  }
+               },
+               "mode" : "button",
+               "path" : "/user/hand/right/input/a"
             }
-          },
-          "mode": "button",
-          "path": "/user/hand/right/input/b"
-        },
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/rotationhand/in/jump"
-            }
-          },
-          "mode": "button",
-          "path": "/user/hand/left/input/a"
-        },
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/rotationhand/in/jump"
-            }
-          },
-          "mode": "button",
-          "path": "/user/hand/right/input/a"
-        },
-        {
-          "inputs": {
-            "position": {
-              "output": "/actions/rotationhand/in/rotate"
-            }
-          },
-          "mode": "joystick",
-          "path": "/user/hand/left/input/thumbstick"
-        },
-        {
-          "inputs": {
-            "position": {
-              "output": "/actions/rotationhand/in/rotate"
-            }
-          },
-          "mode": "joystick",
-          "path": "/user/hand/right/input/thumbstick"
-        },
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/rotationhand/in/cancel"
-            }
-          },
-          "mode": "button",
-          "path": "/user/hand/left/input/b"
-        },
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/rotationhand/in/cancel"
-            }
-          },
-          "mode": "button",
-          "path": "/user/hand/right/input/b"
-        },
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/rotationhand/in/next"
-            }
-          },
-          "mode": "button",
-          "path": "/user/hand/left/input/a"
-        },
-        {
-          "inputs": {
-            "click": {
-              "output": "/actions/rotationhand/in/next"
-            }
-          },
-          "mode": "button",
-          "path": "/user/hand/right/input/a"
-        }
-      ]
-    }
-  },
-  "category": "steamvr_input",
-  "controller_type": "knuckles",
-  "description": "",
-  "interaction_profile": "",
-  "name": "BendyVR configuration for Knuckles Controller",
-  "options": {},
-  "simulated_actions": []
+         ]
+      }
+   },
+   "category" : "steamvr_input",
+   "controller_type" : "knuckles",
+   "description" : "",
+   "interaction_profile" : "",
+   "name" : "My Bendy and the Ink Machine configuration for Index Controller",
+   "options" : {},
+   "simulated_actions" : []
 }

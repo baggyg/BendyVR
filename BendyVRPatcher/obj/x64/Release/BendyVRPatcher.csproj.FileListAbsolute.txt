@@ -1,0 +1,7 @@
+F:\VRUnityModding\BendyVRInstall\Mod\BepInEx\patchers\BendyVRPatcher\classdata.tpk
+F:\VRUnityModding\BendyVRInstall\Mod\BepInEx\patchers\BendyVRPatcher\BendyVRPatcher.dll
+F:\VRUnityModding\BendyVR\BendyVRPatcher\obj\x64\Release\BendyVRPatcher.csproj.AssemblyReference.cache
+F:\VRUnityModding\BendyVR\BendyVRPatcher\obj\x64\Release\BendyVRPatcher.GeneratedMSBuildEditorConfig.editorconfig
+F:\VRUnityModding\BendyVR\BendyVRPatcher\obj\x64\Release\BendyVRPatcher.csproj.CoreCompileInputs.cache
+F:\VRUnityModding\BendyVR\BendyVRPatcher\obj\x64\Release\BendyVRPatcher.csproj.CopyComplete
+F:\VRUnityModding\BendyVR\BendyVRPatcher\obj\x64\Release\BendyVRPatcher.dll

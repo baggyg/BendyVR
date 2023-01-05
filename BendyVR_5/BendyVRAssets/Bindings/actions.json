@@ -28,7 +28,7 @@
       "type": "vibration"
     },
     {
-      "name": "/actions/DominantHand/in/Interact",
+      "name": "/actions/DominantHand/in/SeeingTool",
       "type": "boolean"
     },
     {
@@ -40,20 +40,12 @@
       "type": "boolean"
     },
     {
-      "name": "/actions/NonDominantHand/in/ExpoInvert",
-      "type": "boolean"
-    },
-    {
-      "name": "/actions/NonDominantHand/in/SeeingTool",
+      "name": "/actions/NonDominantHand/in/Interact",
       "type": "boolean"
     },
     {
       "name": "/actions/MovementHand/in/Move",
       "type": "vector2"
-    },
-    {
-      "name": "/actions/MovementHand/in/Teleport",
-      "type": "boolean"
     },
     {
       "name": "/actions/MovementHand/in/Run",
@@ -175,7 +167,6 @@
       "/actions/default/in/SkeletonLeftHand": "Skeleton (Left)",
       "/actions/default/in/SkeletonRightHand": "Skeleton (Right)",
       "/actions/default/out/Haptic": "Haptic",
-      "/actions/DominantHand/in/Interact": "Interact",
       "/actions/RotationHand/in/Rotate": "Rotate",
       "/actions/RotationHand/in/SnapTurnLeft": "Snap Turn Left",
       "/actions/RotationHand/in/Jump": "Jump",
@@ -184,15 +175,15 @@
       "/actions/RotationHand/in/Previous": "Previous",
       "/actions/RotationHand/in/Next": "Next",
       "/actions/MovementHand/in/Move": "Move",
-      "/actions/MovementHand/in/Teleport": "Teleport",
       "/actions/MovementHand/in/Run": "Run",
       "/actions/DominantHand/in/Weapon": "Weapon",
       "/actions/RotationHand/in/SnapTurnRight": "Snap Turn Right",
       "/actions/default/in/PoseRightHand": "Right Hand Pose",
-      "/actions/NonDominantHand/in/ExpoInvert": "Expo Invert",
-      "/actions/NonDominantHand/in/SeeingTool": "Seeing Tool",
       "/actions/NonDominantHand/in/Pause": "Pause Game",
-      "/actions/RotationHand/in/Cancel": "Cancel (UI)"
+      "/actions/RotationHand/in/Cancel": "Cancel (UI)",
+      "/actions/default/in/PoseLeftHand": "Pose Left Hand",
+      "/actions/DominantHand/in/SeeingTool": "SeeingTool",
+      "/actions/NonDominantHand/in/Interact": "Interact"
     }
   ]
 }

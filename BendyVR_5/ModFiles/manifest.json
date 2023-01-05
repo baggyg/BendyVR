@@ -1,0 +1,13 @@
+{
+  "id": "bendy-vr",
+  "modTitle": "Bendy VR",
+  "gameTitle": "Bendy and the Ink Machine",
+  "providers": [
+    {
+      "providerId": "steam",
+      "gameIdentifier": "Bendy and the Ink Machine",
+      "requireAdmin": false,
+      "gameExe": "Bendy and the Ink Machine.exe"
+    }    
+  ]
+}

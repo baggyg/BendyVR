@@ -1,0 +1,59 @@
+{
+  "format": 1,
+  "restore": {
+    "F:\\VRUnityModding\\BendyVR\\BendyVRPatcher\\BendyVRPatcher.csproj": {}
+  },
+  "projects": {
+    "F:\\VRUnityModding\\BendyVR\\BendyVRPatcher\\BendyVRPatcher.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "F:\\VRUnityModding\\BendyVR\\BendyVRPatcher\\BendyVRPatcher.csproj",
+        "projectName": "BendyVRPatcher",
+        "projectPath": "F:\\VRUnityModding\\BendyVR\\BendyVRPatcher\\BendyVRPatcher.csproj",
+        "packagesPath": "C:\\Users\\baggyg\\.nuget\\packages\\",
+        "outputPath": "F:\\VRUnityModding\\BendyVR\\BendyVRPatcher\\obj\\",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "C:\\Users\\baggyg\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        ],
+        "originalTargetFrameworks": [
+          "net35"
+        ],
+        "sources": {
+          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "https://api.nuget.org/v3/index.json": {},
+          "https://nuget.bepinex.dev/v3/index.json": {}
+        },
+        "frameworks": {
+          "net35": {
+            "targetAlias": "net35",
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "net35": {
+          "targetAlias": "net35",
+          "dependencies": {
+            "AssetsTools.NET": {
+              "target": "Package",
+              "version": "[2.0.9, )"
+            },
+            "Mono.Cecil": {
+              "include": "Compile",
+              "target": "Package",
+              "version": "[0.10.4, )"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.307\\RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}
