@@ -4,7 +4,7 @@ Bendy VR is a VR mod for [Bendy and the Ink Machine](https://store.steampowered.
 
 Secondly I would like to thank all of our patrons for supporting us. Without this support the VR mods we are working on would simply not be possible. If you like what we are doing, want to suggest and vote on new ports and get access to in-development versions please click the banner below
 
-[https://github.com/baggyg/BendyVR/blob/main/WebsiteAssets/reddit_mobile_1280_384.jpg?raw=true](https://www.patreon.com/teambeef)
+[![Team Beef Patreon]([link to image on GH](https://github.com/baggyg/BendyVR/blob/main/WebsiteAssets/reddit_mobile_1280_384.jpg))]([link to your URL](https://www.patreon.com/teambeef))
 
 ## How to Install
 
