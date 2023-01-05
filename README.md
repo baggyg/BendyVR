@@ -19,6 +19,8 @@ I would like to thank all of our patrons for supporting us. Without this support
 
 ## How to Install
 
+**Note: If you had a previous in-development version (Patreon version), firstly completely delete the "BepInEx" folder from your Steam BATIM folder and then follow the instructions below.**
+
 - [Download the latest release zip](https://github.com/baggyg/BendyVR/releases/latest).
 - Extract it somewhere safe (you need to keep this folder for the Mod to function). 
 - Open 'TeamBeefInstaller.Exe' and click Install
