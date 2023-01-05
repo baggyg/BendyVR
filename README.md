@@ -1,6 +1,10 @@
 # ![Bendy VR](https://github.com/baggyg/BendyVR/blob/main/WebsiteAssets/BendyVRGithub.jpg)
 
-Bendy VR is a VR mod for [Bendy and the Ink Machine](https://store.steampowered.com/app/622650/Bendy_and_the_Ink_Machine/), with full motion control support.
+Bendy VR is a VR mod for [Bendy and the Ink Machine](https://store.steampowered.com/app/622650/Bendy_and_the_Ink_Machine/), with full motion control support. This is Team Beef's very first PCVR mod. I would firstly like to thank Raicuparta. Its fair to say eithe BendyVR would not have existed without his VR mods, or would have certainly taken a long time to create. Quite a few systems are based upon his work, including the Installer. Raicuparta has a slew of his own VR mods which you can browse [on his website](https://raicuparta.com/). 
+
+Secondly I would like to thank all of our patrons for supporting us. Without this support the VR mods we are working on would simply not be possible. If you like what we are doing, want to suggest and vote on new ports and get access to in-development versions please click the banner below
+
+[https://github.com/baggyg/BendyVR/blob/main/WebsiteAssets/reddit_mobile_1280_384.jpg?raw=true](https://www.patreon.com/teambeef)
 
 ## How to Install
 
@@ -63,6 +67,7 @@ Bendy VR ships with [openvr_fsr](https://github.com/fholger/openvr_fsr), which i
 - After the credits you have to exit game (and restart for new game + / archives). Your game will have been saved.
 - You cannot get back to the main menu from the pause menu. Clicking quit and then Confirm will exit the games completely. I will look to fix this in the future. 
 - Fog / Some Other Post-Processing Effects rotate with view. Unfortuantely "allowRoll" was added in Unity Version (2018.3) BATIM uses 2018.2. 
+- Some of the rising seems to follow your view. This is caused by the original developers using a "Cutout" masking to block of part of the mesh to present the appearnace of "moving ink". I can't decompile this shader so am unable to alter. 
 
 ## How to Uninstall
 
@@ -73,4 +78,3 @@ Open the TeamBeefInstaller.exe and click the Uninstall button.
 If you find bugs or are otherwise facing problems with the mod, please [open an issue](https://github.com/baggyg/BendyVR/issues/new/choose).
 
 You can also contact Team Beef on the [Team Beef Discord](https://discord.gg/fA6m8SMZPA). 
-
