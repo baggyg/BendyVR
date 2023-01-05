@@ -1,12 +1,21 @@
 # ![Bendy VR](https://github.com/baggyg/BendyVR/blob/main/WebsiteAssets/BendyVRGithub.jpg)
 
-Bendy VR is a VR mod for [Bendy and the Ink Machine](https://store.steampowered.com/app/622650/Bendy_and_the_Ink_Machine/), with full motion control support. This is Team Beef's very first PCVR mod. I would firstly like to thank Raicuparta. Its fair to say that either BendyVR would not have existed without his VR mods or would have certainly taken a long time to create. Quite a few systems are based upon or using  his work, including the Installer. Raicuparta has a slew of his own VR mods which you can browse [on his website](https://raicuparta.com/). 
+Bendy VR is a VR mod for [Bendy and the Ink Machine](https://store.steampowered.com/app/622650/Bendy_and_the_Ink_Machine/), with full motion control support. This is Team Beef's very first (of hopefully many) PCVR mods. 
+
+I would firstly like to thank Raicuparta for the example and work he has already contributed to Flat2VR mods. Its fair to say that either BendyVR would not have existed without his VR mods or would have certainly taken a much longer time to create. Quite a few systems are based upon or using his work, including the Installer. Raicuparta has a slew of his own VR mods which you can browse [on his website](https://raicuparta.com/). 
 
 ## Team Beef Patreon / Support Team Beef
 
 I would like to thank all of our patrons for supporting us. Without this support the VR mods we are working on would simply not be possible. If you like what we are doing, want to suggest and vote on new ports and get access to in-development versions please click the banner below
 
 [![Team Beef Patreon](https://github.com/baggyg/BendyVR/blob/main/WebsiteAssets/reddit_mobile_1280_384.jpg)](https://www.patreon.com/teambeef)
+
+## Features
+
+- Motion controlled hands with melee combat
+- VR Comfort Options (Snap / Smooth Turn)
+- Support for Left Handed Users (Including Switch Sticks)
+- Countless game alterations to make this as fun as possible in VR
 
 ## How to Install
 
