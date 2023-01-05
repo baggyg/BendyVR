@@ -69,18 +69,13 @@ Ambient Occlusion does have some small artifacts which are different in each eye
 
 Bendy VR ships with [openvr_fsr](https://github.com/fholger/openvr_fsr), which is already enabled on Ultra Quality Mode. To disable or adjust FSR , edit `\Bendy and the Ink Machine\Bendy and the Ink Machine_Data\Plugins\openvr_mod.cfg`. Check the [openvr_fsr readme](https://github.com/fholger/openvr_fsr#readme) for more details.
 
-##Known Issues
+## Known Issues
 
 - Ending Cinematic is screen locked - this is due to the Unity Video Player used. 
-
 - After the credits you have to exit game (and restart for new game + / archives). Your game will have been saved.
-
 - You cannot get back to the main menu from the pause menu. Clicking quit and then Confirm will exit the games completely. I will look to fix this in the future. 
-
 - Fog / Some Other Post-Processing Effects rotate with view. Unfortuantely "allowRoll" was added in Unity Version (2018.3) BATIM uses 2018.2. 
-
 - Some of the rising seems to follow your view. This is caused by the original developers using a "Cutout" masking to block of part of the mesh to present the appearnace of "moving ink". I can't decompile this shader so am unable to alter. 
-
 
 ## How to Uninstall
 
