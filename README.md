@@ -28,6 +28,14 @@ I would like to thank all of our patrons for supporting us. Without this support
 - Open 'TeamBeefInstaller.Exe' and click Install
 - Either Run the game as usual or by clicking the "Start Game" button in the Installer.
 
+## Troubleshooting
+
+If anyone is having an issue with BendyVR install, please follow the below process:
+
+- first ensure the Mod files are on the same drive as the game itself. If not use the uninstall, move the files to the same drive (anywhere in the same drive), then click the install button again. 
+- Ensure the BepInEx window starts when starting the game. If it doesn't then the links are wrong and check doorstop_config.ini from your game folder to see where it is looking and send this across. If there is any odd characters, this could be causing an issue and we suggest uninstalling (from the Installer), copying the mod to the root of that drive (I.e. C:/BendyInstall) and then installing again.
+- If BepInEx is working then send across any errors this shows (ideally a screenshot of the whole window)
+
 ## Requirements
 
 - A compatible version of Bendy and the Ink Machine. Currently that's version 1.1.2. This version is available in these stores:
