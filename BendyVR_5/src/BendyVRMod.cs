@@ -11,7 +11,7 @@ using Valve.VR;
 
 namespace BendyVR_5.src;
 
-[BepInPlugin("org.baggyg.vrplugins.bendyvr", "BendyVR", "0.0.1")]
+[BepInPlugin("org.baggyg.vrplugins.bendyvr", "BendyVR", "1.1.0")]
 [BepInProcess("Bendy and the Ink Machine.exe")]
 
 // A soft dependency. Loading won't be skipped if it's missing.
@@ -43,23 +43,11 @@ public class BendyVRPlugin : BaseUnityPlugin
         //logBendyVR.LogError("This is an error - No Time to Do it!");
 
         //CONFIG SETTINGS
-        configEnableMod = Config.Bind("General",
-                                    "EnableMod",
-                                    true,
-                                    "Whether or not to launch the mod");
-
-        if (configEnableMod.Value)
-        {
-            //HARMONY PATCHING OF METHODS
-            VrSettings.SetUp(Config);
-            Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
-            VrAssetLoader.LoadAssets();
-            InitSteamVR();
-        }
-        else
-        {
-            logBendyVR.LogWarning("BendyVR Disabled - Check Config");
-        }
+        //HARMONY PATCHING OF METHODS
+        VrSettings.SetUp(Config);
+        Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+        VrAssetLoader.LoadAssets();
+        InitSteamVR();        
 
         // Remove the source to free resources
         //BepInEx.Logging.Logger.Sources.Remove(logBendyVR);

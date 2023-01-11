@@ -113,7 +113,7 @@ public class UIPatches : BendyVRPatch
         __instance.transform.localPosition = new Vector3(1120f, 900f, 0f);
     }
 
-    //Reposition the Pause Menu
+    /*//Reposition the Pause Menu
     [HarmonyPostfix]
     [HarmonyPatch(typeof(GameMenuController), nameof(GameMenuController.InitController))]
     private static void RepositionPauseMenu(GameMenuController __instance)
@@ -123,7 +123,7 @@ public class UIPatches : BendyVRPatch
         //__instance.transform.localScale = new Vector3(1.2f, 1.2f, 1.2f);
         __instance.transform.localPosition = new Vector3(-400f, 0f, 0f);
 
-    }
+    }*/
 
     /*[HarmonyPostfix]
     [HarmonyPatch(typeof(HurtBordersController), nameof(HurtBordersController.InitController))]

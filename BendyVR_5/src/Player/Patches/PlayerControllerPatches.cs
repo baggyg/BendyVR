@@ -4,6 +4,7 @@ using DG.Tweening;
 using HarmonyLib;
 using System;
 using System.Collections.Generic;
+using TMG.Controls;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,6 +26,47 @@ public class PlayerControllerPatches : BendyVRPatch
 	private static void WhatAmICollidingWith(EventTrigger __instance, Collider col)
 	{
 		Logs.WriteWarning(__instance.transform.name + " Collided with " + col.transform.name);
+	}
+		
+	[HarmonyPrefix]
+	[HarmonyPatch(typeof(InteractableInputController), nameof(InteractableInputController.UpdateInteraction), new Type[] { typeof(Vector3), typeof(Vector3), typeof(float) }, new ArgumentType[] { ArgumentType.Normal, ArgumentType.Normal, ArgumentType.Normal })]
+	public static bool VRUpdateInteraction(InteractableInputController __instance, Vector3 origin, Vector3 direction, float distance)
+	{
+		if (!__instance.m_Active)
+		{
+			return false;
+		}
+		//if (Physics.SphereCast(origin, __instance.m_SphereCastThickness, direction, out var hitInfo, distance, ~(int)__instance.m_IgnoreLayers))
+		if (Physics.SphereCast(origin, 0.3f, direction, out var hitInfo, distance, ~(int)__instance.m_IgnoreLayers))
+		{
+			Interactable component = hitInfo.transform.GetComponent<Interactable>();
+			if ((bool)component)
+			{
+				__instance.DrawDebugLine(origin, hitInfo.point, Color.yellow);
+				if (__instance.Interactable != component)
+				{
+					__instance.ExitInteraction();
+				}
+				__instance.Interactable = component;
+				if (PlayerInput.InteractOnPressed())
+				{
+					__instance.Interact();
+				}
+				else
+				{
+					__instance.EnterInteraction();
+				}
+			}
+			else
+			{
+				__instance.ExitInteraction();
+			}
+		}
+		else
+		{
+			__instance.ExitInteraction();
+		}
+		return false;
 	}
 
 	[HarmonyPrefix]
@@ -75,123 +117,4 @@ public class PlayerControllerPatches : BendyVRPatch
 		__instance.m_HitCount++;
 		return false;
 	}
-
-	/*[HarmonyPrefix]
-	[HarmonyPatch(typeof(PlayerController), nameof(PlayerController.GetRotations))]
-	private static bool OverrideRotations(PlayerController __instance)
-	{
-		if (!__instance.isLocked)
-		{
-			//Save the camera absolute rotation
-			Vector3 savedRotation = GameManager.Instance.GameCamera.transform.eulerAngles;
-			__instance.m_PlayerLook.Rotation(__instance.transform, __instance.m_HeadContainer, __instance.m_HandContainer);
-			savedRotation.z = 0f;
-			GameManager.Instance.GameCamera.transform.eulerAngles = savedRotation;			
-		}
-		if (__instance.m_CharacterController.isGrounded && !__instance.m_PreviouslyGrounded && __instance.m_LandingAudioBS)
-		{
-			__instance.StartCoroutine(__instance.m_HeadBob.DoJumpBob());
-			__instance.m_PlayerFootsteps.PlayLandAudio();
-			__instance.m_ExternalForce = Vector3.zero;
-		}
-		
-		
-
-		return false;
-	}
-
-	/*[HarmonyPostfix]
-    [HarmonyPatch(typeof(PlayerController), nameof(PlayerController.GetRotations))]
-    private static void OverrideRotations(PlayerController __instance)
-    {
-		//offset camera movement
-		Transform cameraParent = __instance.CameraParent.Find("VrCameraParent");
-		//Transform cameraParent = __instance.m_CameraContainer;
-		Logs.WriteInfo("Camera's Parent: " + cameraParent.name);
-
-		//Quaternion targetRotation = Quaternion.Euler(0f, 0f, 0f);
-		Quaternion targetRotation = Quaternion.Euler(-__instance.m_PlayerLook.m_InputY, 0f, 0f);
-		//Logs.WriteInfo("Reverse Y Received as " + (-__instance.m_PlayerLook.m_InputY).ToString());
-		cameraParent.rotation = targetRotation;
-		Vector3 eulerAngles = cameraParent.eulerAngles;
-		eulerAngles.z = 0f;
-		cameraParent.eulerAngles = eulerAngles;
-				
-	}*/
-
-	/*[HarmonyPrefix]
-	[HarmonyPatch(typeof(CharacterLook), nameof(CharacterLook.GetInput))]
-	private static bool GetCorrectYInput(CharacterLook __instance)
-    {
-		float tSpeed = -0.4f;
-		if (__instance.turnSpeedBoostTimer > 0.3f)
-		{
-			tSpeed = 0f;
-		}
-		float num = PlayerInput.LookX(tSpeed);
-		if (Mathf.Abs(num) > 0.1f)
-		{
-			__instance.turnSpeedBoostTimer += Time.deltaTime;
-		}
-		else
-		{
-			__instance.turnSpeedBoostTimer = 0f;
-		}
-		__instance.m_InputX = num * __instance.m_Sensitivity;
-
-		//__instance.m_InputY = (0f - PlayerInput.LookY()) * __instance.m_Sensitivity;
-		//Instead of above lets just take the exact Y angle from the camera
-		__instance.m_InputY = GameManager.Instance.GameCamera.transform.eulerAngles.x;
-		//Logs.WriteInfo(GameManager.Instance.GameCamera.name + ": " + GameManager.Instance.GameCamera.transform.localEulerAngles.x.ToString() + " : " + GameManager.Instance.GameCamera.transform.eulerAngles.x.ToString());
-		return false;
-	}
-	
-	
-	[HarmonyPrefix]
-	[HarmonyPatch(typeof(CharacterLook), nameof(CharacterLook.Rotation), new Type[] { typeof(Transform), typeof(Transform), typeof(bool) })]
-	public static bool ViewRotation(CharacterLook __instance, Transform character, Transform camera, bool hasGravity)
-	{
-		if (!__instance.IsNullRotation(__instance.m_InputX, __instance.m_InputY))
-		{
-			if (hasGravity)
-			{
-				__instance.m_CharacterTargetRotation *= Quaternion.Euler(0f, __instance.m_InputX, 0f);
-				if (__instance.hasHorizontalLock)
-				{
-					__instance.m_CharacterTargetRotation = __instance.ClampRotationYAxis(__instance.m_CharacterTargetRotation, 0f - __instance.m_HorizontalClamp, __instance.m_HorizontalClamp);
-				}
-				character.localRotation = __instance.m_CharacterTargetRotation;
-				if ((bool)camera)
-				{
-					//Not times by
-					//__instance.m_CameraTargetRotation *= Quaternion.Euler(m_InputY, 0f, 0f);
-					__instance.m_CameraTargetRotation = Quaternion.Euler(__instance.m_InputY, 0f, 0f);
-					if (__instance.m_ClampVerticalRotation)
-					{
-						__instance.m_CameraTargetRotation = __instance.ClampRotationXAxis(__instance.m_CameraTargetRotation, 0f - __instance.m_VerticalClamp, __instance.m_VerticalClamp);
-					}
-					camera.rotation = __instance.m_CameraTargetRotation;
-					Vector3 localEulerAngles = camera.eulerAngles;
-					localEulerAngles.z = 0f;
-					camera.eulerAngles = localEulerAngles;
-					//character.localRotation = __instance.m_CameraTargetRotation;
-				}
-			}
-			else
-			{
-				__instance.m_CharacterTargetRotation *= Quaternion.Euler(__instance.m_InputY, __instance.m_InputX, 0f);
-				//character.localRotation = __instance.m_CharacterTargetRotation;
-			}
-		}
-		else
-		{
-			//character.localRotation = __instance.m_CharacterTargetRotation;
-			if ((bool)camera)
-			{
-				camera.localRotation = __instance.m_CameraTargetRotation;
-			}
-		}
-		__instance.UpdateCursorLock();
-		return false;
-	}*/
 }

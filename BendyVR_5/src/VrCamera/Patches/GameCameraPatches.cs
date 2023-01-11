@@ -8,6 +8,7 @@ using UnityEngine.PostProcessing;
 using TMG.Core;
 using System;
 using BendyVR_5.src;
+using BendyVR_5.Settings;
 
 namespace BendyVR_5.VrCamera.Patches;
 
@@ -119,9 +120,15 @@ public class GameCameraPatches : BendyVRPatch
     }
 
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(FirstPersonHeadBob), nameof(FirstPersonHeadBob.UpdateCameraPosition))]
+    [HarmonyPatch(typeof(FirstPersonHeadBob), nameof(FirstPersonHeadBob.UpdateCameraPosition))]    
+    private static bool RemoveHeadBob()
+    {
+        return VrSettings.EnableHeadBob.Value;
+    }
+
+    [HarmonyPrefix]
     [HarmonyPatch(typeof(CameraMovements), nameof(CameraMovements.Sway))]
-    private static bool RemoveHeadBobAndSway()
+    private static bool RemoveSway()
     {
         return false;
     }
@@ -130,9 +137,13 @@ public class GameCameraPatches : BendyVRPatch
     [HarmonyPatch(typeof(FirstPersonHeadBob), nameof(FirstPersonHeadBob.SetActive))]
     private static bool DeactivateHeadBob(FirstPersonHeadBob __instance)
     {
-        __instance.m_Active = false;
-        __instance.m_EnableJumpBob = false;
-        return false;
+        if (!VrSettings.EnableHeadBob.Value)
+        {
+            __instance.m_Active = false;
+            __instance.m_EnableJumpBob = false;
+            return false;
+        }
+        return true;
     }
 
     //Effect glitches

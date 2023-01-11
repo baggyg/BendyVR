@@ -18,11 +18,78 @@ namespace BendyVR_5.Chapters.Patches;
 [HarmonyPatch]
 public class MiniGameFixes : BendyVRPatch
 {
+	[HarmonyPrefix]
+	[HarmonyPatch(typeof(WinnableMiniGameBaseController), nameof(WinnableMiniGameBaseController.PrepPlayerForGame))]
+	private static bool VRPrepPlayerForGame(WinnableMiniGameBaseController __instance)
+	{		
+		GameManager.Instance.ShowScreenBlocker();
+		Vector3 endValue = GameManager.Instance.Player.transform.position - GameManager.Instance.Player.transform.forward * 5f;
+		GameManager.Instance.Player.SetCollision(active: false);
+		__instance.m_FreeRoamCam = GameManager.Instance.GameCamera.InitializeFreeRoamCam();
+		__instance.m_LocalLookTransform.localRotation = Quaternion.identity;
+		Sequence sequence = DOTween.Sequence();
+		float num = 0f;
+		if (__instance.m_HeldItemPositionTransform != null)
+		{
+			sequence.Insert(num, __instance.m_HeldItemPositionTransform.DOLocalMoveY(-5f, 0.65f).SetEase(Ease.InOutQuad));
+		}
+		if (__instance.m_PickUpInteractionObject)
+		{
+			sequence.InsertCallback(num, __instance.OnPickupObject);
+			sequence.Insert(num, __instance.m_InteractGameStart.transform.DOMove(endValue, 0.65f).SetEase(Ease.InOutQuad));
+			num += 0.3f;
+			sequence.InsertCallback(num, delegate
+			{
+				__instance.m_InteractGameStart.gameObject.SetActive(value: false);
+			});
+		}
+		if (GameManager.Instance.Player.WeaponGameObject != null)
+		{
+			sequence.Insert(num, GameManager.Instance.Player.WeaponGameObject.transform.DOLocalMoveY(-5f, 0.25f).SetEase(Ease.InQuad));
+			sequence.Insert(num, GameManager.Instance.Player.WeaponGameObject.transform.DOLocalRotate(new Vector3(180f, 0f, 0f), 0.2f, RotateMode.LocalAxisAdd).SetEase(Ease.InQuad));
+			sequence.InsertCallback(num + 0.1f, delegate
+			{
+				GameManager.Instance.Player.WeaponGameObject.SetActive(value: false);
+				GameManager.Instance.Player.UnEquipWeapon();
+			});
+		}
+		
+		num += 0.15f;
+		sequence.Insert(num, __instance.m_FreeRoamCam.DOMove(__instance.m_LocalLookTransform.position, 0.65f).SetEase(Ease.InOutQuad));
+		sequence.Insert(num, __instance.m_FreeRoamCam.DOMove(__instance.m_LocalLookTransform.position, 0.65f).SetEase(Ease.InOutQuad));
+		sequence.Insert(num, __instance.m_FreeRoamCam.DORotate(__instance.m_LocalLookTransform.eulerAngles, 0.7f).SetEase(Ease.InOutQuad));
+		num += 0.5f;
+		sequence.OnComplete(__instance.HandleOnPlayerPrepped);
+		
+		return false;
+	}
+	
+	[HarmonyPostfix]
+	[HarmonyPatch(typeof(WinnableMiniGameBaseController), nameof(WinnableMiniGameBaseController.HandleOnPlayerPrepped))]
+	private static void HandleOnPlayerPrepped()
+	{
+		GameManager.Instance.HideScreenBlocker(0.5f);		
+	}
+
+	[HarmonyPrefix]
+	[HarmonyPatch(typeof(WinnableMiniGameBaseController), nameof(WinnableMiniGameBaseController.HandleOnQuitGame))]
+	private static void VRHandleOnQuitGame()
+	{
+		GameManager.Instance.ShowScreenBlocker();
+	}
+
+	[HarmonyPostfix]
+	[HarmonyPatch(typeof(WinnableMiniGameBaseController), nameof(WinnableMiniGameBaseController.EnablePlayer))]
+	private static void VREnablePlayer()
+	{
+		GameManager.Instance.HideScreenBlocker(0.5f);
+	}
+
 	[HarmonyPostfix]
 	[HarmonyPatch(typeof(WinnableMiniGameBaseController), nameof(WinnableMiniGameBaseController.PrepPlayerForGame))]
 	private static void VRPrepMiniGame(WinnableMiniGameBaseController __instance)
 	{
-        VRPlayerController vrPlayerController = VrCore.instance.GetVRPlayerController();
+		VRPlayerController vrPlayerController = VrCore.instance.GetVRPlayerController();
 
         //Poss Fix - Make sure this is the child of hand (not sure why its not here)
         Logs.WriteWarning("Preparing Mini Game Object " + __instance.HeldObject.name);
@@ -31,7 +98,8 @@ public class MiniGameFixes : BendyVRPatch
         __instance.HeldObject.SetParent(GameManager.Instance.Player.WeaponParent);
 
         if (__instance is Minigame_ShootingGallery ||
-			__instance is Minigame_BallToss)
+			__instance is Minigame_BallToss ||
+			__instance is Minigame_Darts)
         {
             vrPlayerController.SetupGunWeapon(__instance.HeldObject.name);
         }		
@@ -209,8 +277,86 @@ public class MiniGameFixes : BendyVRPatch
 		return false;
 	}
 
+	[HarmonyPrefix]
+	[HarmonyPatch(typeof(Minigame_Darts), nameof(Minigame_Darts.Update))]
+	public static bool UpdateDartUpdate(Minigame_Darts __instance)
+	{
+		//Can't use base so copy the code from there (instead of doing a Reverse Patch):
+		//base.Update();
+		/// BASE UPDATE ///
+		if (!GameManager.Instance.isPaused && (!GameManager.Instance.Player || GameManager.Instance.Player.CurrentStatus == CombatStatus.Hiding) && (__instance.CurrentState == WinnableMiniGameBaseController.MiniGameState.ACTIVE || __instance.CurrentState == WinnableMiniGameBaseController.MiniGameState.PREPPING) && __instance.CurrentState == WinnableMiniGameBaseController.MiniGameState.ACTIVE)
+		{
+			if (PlayerInput.InteractOnPressed())
+			{
+				__instance.CurrentState = WinnableMiniGameBaseController.MiniGameState.INACTIVE;
+				__instance.ForceExitGame();
+			}
+			__instance.m_CharacterLook.GetInput();
+		}
 
-		[HarmonyPrefix]
+		if (__instance.CurrentState == WinnableMiniGameBaseController.MiniGameState.ACTIVE && !__instance.m_Reloading)
+		{
+			//m_TimeSinceStart += Time.deltaTime;
+			//m_ThrowForce = 0.75f * (1f + Mathf.Sin(6.28f * m_TimeSinceStart));
+			//base.HeldObject.localPosition = new Vector3(0f, 0f, 0.5f * (0f - m_ThrowForce));
+			if (PlayerInput.Attack())
+			{
+				__instance.m_DartCount++;
+				__instance.m_Reloading = true;
+				ThrowableObject throwableObject = UnityEngine.Object.Instantiate(__instance.m_ThrowableDart);
+				throwableObject.transform.position = __instance.HeldObject.position;
+				throwableObject.transform.eulerAngles = GameManager.Instance.GameCamera.FreeRoamCam.eulerAngles;
+				//throwableObject.transform.eulerAngles = __instance.HeldObject.eulerAngles;
+				throwableObject.gameObject.SetActive(value: true);
+				throwableObject.Initialize(throwableObject.WeaponInfo, -__instance.HeldObject.transform.right * throwableObject.Force);
+				throwableObject.OnHit += __instance.HandleDartOnHit;
+				throwableObject.Throw();
+				__instance.ActiveDarts.Add(throwableObject);
+				__instance.HeldObject.gameObject.SetActive(value: false);
+				__instance.HeldObject.localPosition += new Vector3(0f, -5f, 0f);
+				__instance.Reload();
+				__instance.m_AudioSwitch.Play("fire");
+			}
+		}
+
+		return false;
+	}
+
+	/*[HarmonyPrefix]
+	[HarmonyPatch(typeof(Minigame_Darts), nameof(Minigame_Darts.Update))]
+	private static bool Reload()
+	{
+		if (base.CurrentState != MiniGameState.ACTIVE)
+		{
+			return;
+		}
+		if (m_DartCount >= m_DartMax)
+		{
+			m_DartCount = 0;
+			ExitGameSequence = DOTween.Sequence();
+			ExitGameSequence.InsertCallback(2f, delegate
+			{
+				SetState(MiniGameState.INACTIVE);
+				ExitGame();
+			});
+			return;
+		}
+		Sequence s = DOTween.Sequence();
+		float num = 1f;
+		s.InsertCallback(num, delegate
+		{
+			base.HeldObject.gameObject.SetActive(value: true);
+		});
+		s.Insert(num, base.HeldObject.DOLocalMove(Vector3.zero, 0.5f).SetEase(Ease.OutQuad));
+		num += 0.5f;
+		s.InsertCallback(num, delegate
+		{
+			m_Reloading = false;
+		});
+		return false;
+	}*/
+
+	[HarmonyPrefix]
 	[HarmonyPatch(typeof(Minigame_BallToss), nameof(Minigame_BallToss.Update))]
 	public static bool UpdateBallToss(Minigame_BallToss __instance)
 	{

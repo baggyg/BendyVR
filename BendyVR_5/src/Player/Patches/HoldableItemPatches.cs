@@ -355,12 +355,18 @@ public class HoldableItemPatches : BendyVRPatch
             weaponYOffset = 0.0f;
         }
 
+        if (VrCore.instance.GetVRPlayerController().playHitCooldown > 0.0f)
+        {
+            return false;
+        }
 
         //Try a cast
         if (Physics.SphereCast(transform.position + (transform.rotation * new Vector3(0f, 0f, weaponYOffset)), 0.5f, -transform.up, out var hitInfo, __instance.m_WeaponRange, ~(int)__instance.m_IgnoreLayers))
         {
             //If Hit Something
             __instance.OnRaycastHit(hitInfo);
+
+            VrCore.instance.GetVRPlayerController().playHitCooldown = 0.5f;//Half a second cooldown betweeen successful hits
             //if (__instance.m_debugHitObject)
             //{
 
@@ -443,6 +449,7 @@ public class HoldableItemPatches : BendyVRPatch
                 __instance.OnAttack();
             }
 
+            
             //Reset the swing sound
             if (VrCore.instance.GetAttackVelocity() < VrSettings.VelocityTrigger.Value && VrCore.instance.GetAttackAngularVelocity() < VrSettings.AngularVelocityTrigger.Value &&
                VrCore.instance.GetVRPlayerController().playSwingCooldown <= 0f)
@@ -451,6 +458,7 @@ public class HoldableItemPatches : BendyVRPatch
             }
             if(VrCore.instance.GetVRPlayerController().playSwingCooldown >= 0f)
                 VrCore.instance.GetVRPlayerController().playSwingCooldown -= Time.deltaTime;
+            
         }
         
         /*else if(!__instance.m_CanAttack && (VrCore.instance.GetAttackVelocity() >= VrSettings.VelocityTrigger.Value || VrCore.instance.GetAttackAngularVelocity() >= VrSettings.AngularVelocityTrigger.Value))

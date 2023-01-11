@@ -63,6 +63,7 @@ internal class VRPlayerController : MonoBehaviour
 
 	public bool playSwingSound = true;
 	public float playSwingCooldown = 0f;
+	public float playHitCooldown = 0f;
 
 	//Snap Turning Things
 	private const float smoothRotationBaseSpeed = 50f;
@@ -437,6 +438,12 @@ internal class VRPlayerController : MonoBehaviour
 			weapon.localPosition = new Vector3(0f, 0f, -0.1f);
 			weapon.localEulerAngles = new Vector3(90f, 0f, 0f);
 		}
+		else if (weapon_name.ToLower().Equals("dart") ||
+			weapon_name.ToLower().Equals("dar(clone)"))
+		{
+			weapon.localPosition = new Vector3(0f, 0f, -0.1f);
+			weapon.localEulerAngles = new Vector3(0f, 0f, 90f);
+		}
 		else 
 		{
 			//Move the Bullets / Sparks Etc
@@ -739,6 +746,12 @@ internal class VRPlayerController : MonoBehaviour
 		}
 		else if (!GameManager.Instance.isPaused)
 		{
+			//Decrease hit time
+			if (VrCore.instance.GetVRPlayerController().playHitCooldown > 0.0f)
+			{
+				VrCore.instance.GetVRPlayerController().playHitCooldown -= Time.deltaTime;
+			}
+
 			//Jump
 			mPlayerController.m_PlayerLook.GetInput();
 			if (mPlayerController.m_CharacterController.isGrounded && !mPlayerController.m_JumpInput && mPlayerController.m_EnableJump && mPlayerController.canJump && !mPlayerController.isLocked && !mPlayerController.isMoveLocked)
@@ -784,7 +797,9 @@ internal class VRPlayerController : MonoBehaviour
 				deltaAxeRotation.ToAngleAxis(out var angle, out var axis);
 				angle *= Mathf.Deg2Rad;
 				Vector3 angularVelocity = (1.0f / Time.deltaTime) * angle * axis;
-				angularVelocityVectorLength = angularVelocity.magnitude;				
+				angularVelocityVectorLength = angularVelocity.magnitude;
+
+				
 			}
 		}
 	}
@@ -846,16 +861,14 @@ internal class VRPlayerController : MonoBehaviour
 				mPlayerController.m_ExternalForce = Vector3.MoveTowards(mPlayerController.m_ExternalForce, Vector3.zero, 3f * Time.fixedDeltaTime * num);
 			}
 		}
-		/*if (isSeeingToolActive)
+		if (VrSettings.EnableHeadBob.Value && mPlayerController.isSeeingToolActive)
 		{
-			m_HeadBob.UpdateCameraPosition(0f, 0f);
-		}*/
+			mPlayerController.m_HeadBob.UpdateCameraPosition(0f, 0f);
+		}
 		//mPlayerController.GetRotations();
 		turnController();
 		//PlayerLookRotations(mPlayerController.transform, mPlayerController.m_HeadContainer, mPlayerController.m_HandContainer);
-		mPlayerController.m_PlayerLook.UpdateCursorLock();
-
-		
+		mPlayerController.m_PlayerLook.UpdateCursorLock();		
 	}
 
 	public void ResetRoomDampener()
@@ -917,14 +930,14 @@ internal class VRPlayerController : MonoBehaviour
 			}
 		}
 
-		if (!inFreeRoam)
+		/*if (!inFreeRoam && !VrSettings.EnableHeadBob.Value)
 		{
 			Vector3 camDiff = mPlayerController.transform.position - GameManager.Instance.GameCamera.transform.position;
 			Vector3 headDiff = mPlayerController.HeadContainer.transform.position - GameManager.Instance.GameCamera.transform.position;
 		
 			if (Mathf.Abs(camDiff.x) > 0.01 || Mathf.Abs(camDiff.z) > 0.01 || Mathf.Abs(headDiff.x) > 0.01 || Mathf.Abs(headDiff.z) > 0.01)
 				Logs.WriteInfo("PC -> Cam : " + camDiff.x + " " + camDiff.z + "Head -> Cam : " + headDiff.x + " " + headDiff.z);
-		}
+		}*/
 
 		oldPosition = newPosition;		
 	}
@@ -1102,7 +1115,10 @@ internal class VRPlayerController : MonoBehaviour
 		}
 		mPlayerController.m_PlayerFootsteps.SetFootstepType(footstepType);
 		mPlayerController.m_PlayerFootsteps.ProgressStepCycle(magnitude, speed);
-		//mPlayerController.m_HeadBob.UpdateCameraPosition(magnitude, speed);
+		if (VrSettings.EnableHeadBob.Value)
+		{
+			mPlayerController.m_HeadBob.UpdateCameraPosition(magnitude, speed);
+		}
 		//mPlayerController.m_CameraFOV.UpdateVOD(magnitude, speed, m_IsRunning);
 	}
 

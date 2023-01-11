@@ -60,7 +60,9 @@ public static class VrSettings
     public static ConfigEntry<bool> ShowLaserPointer { get; private set; }
     public static ConfigEntry<bool> SwapSticks { get; private set; }
     public static ConfigEntry<bool> ControllerBasedMovementDirection { get; private set; }
-    
+    public static ConfigEntry<bool> EnableHeadBob { get; private set; }
+    public static ConfigEntry<bool> EnableParticles { get; private set; }
+
     //public static ConfigEntry<float> WorldScale { get; private set; }
     public static float WorldScale = 3.5f;
     public static ConfigEntry<float> HeightOffset { get; private set; }
@@ -89,6 +91,10 @@ public static class VrSettings
             "Make player body follow headset position|Disabling prevents drifting, but you'll need to occasionally recenter manually in the pause menu.");
         ControllerBasedMovementDirection = config.Bind(controlsCategory, "ControllerBasedMovementDirection", false,
             "Controller-based movement direction|Enabled: controller-based direction. Disabled: head-based direction.");
+        EnableHeadBob = config.Bind(comfortCategory, "EnableHeadBob", false,
+            "Enable to turn on Headbob (default: off)");
+        EnableParticles = config.Bind(comfortCategory, "EnableParticles", true,
+            "Turn on Dust and Particles (default: on)");
         LeftHandedMode = config.Bind(controlsCategory, "LeftHandedMode", false,
             "Left handed mode.");
         ShowLaserPointer = config.Bind(controlsCategory, "ShowLaserPointer", false,

@@ -71,7 +71,7 @@ public class InputManagerPatches : BendyVRPatch
 	
 
 
-		[HarmonyPrefix]
+	[HarmonyPrefix]
 	[HarmonyPatch(typeof(InputUtil), nameof(InputUtil.GetInputY),new Type[] { typeof(float), typeof(bool) },new ArgumentType[] { ArgumentType.Out, ArgumentType.Out})]
 	private static bool ReplaceInputY(ref bool __result, out float axis, out bool hasMouse)
 	{

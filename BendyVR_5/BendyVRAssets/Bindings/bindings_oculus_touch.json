@@ -3,257 +3,6 @@
    "alias_info" : {},
    "app_key" : "steam.app.622650",
    "bindings" : {
-      "/actions/DominantHand" : {
-         "chords" : [],
-         "haptics" : [],
-         "poses" : [],
-         "skeleton" : [],
-         "sources" : [
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/DominantHand/in/interact"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/x"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/DominantHand/in/interact"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/x"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/DominantHand/in/weapon"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/trigger"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/DominantHand/in/weapon"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/trigger"
-            }
-         ]
-      },
-      "/actions/MovementHand" : {
-         "chords" : [],
-         "haptics" : [],
-         "poses" : [],
-         "skeleton" : [],
-         "sources" : [
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/movementhand/in/run"
-                  },
-                  "position" : {
-                     "output" : "/actions/movementhand/in/move"
-                  }
-               },
-               "mode" : "joystick",
-               "path" : "/user/hand/left/input/joystick"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/movementhand/in/run"
-                  },
-                  "position" : {
-                     "output" : "/actions/movementhand/in/move"
-                  }
-               },
-               "mode" : "joystick",
-               "path" : "/user/hand/right/input/joystick"
-            },
-            {
-               "inputs" : {
-                  "north" : {
-                     "output" : "/actions/movementhand/in/teleport"
-                  }
-               },
-               "mode" : "dpad",
-               "parameters" : {
-                  "sub_mode" : "touch"
-               },
-               "path" : "/user/hand/left/input/joystick"
-            },
-            {
-               "inputs" : {
-                  "north" : {
-                     "output" : "/actions/movementhand/in/teleport"
-                  }
-               },
-               "mode" : "dpad",
-               "parameters" : {
-                  "sub_mode" : "touch"
-               },
-               "path" : "/user/hand/right/input/joystick"
-            }
-         ]
-      },
-      "/actions/NonDominantHand" : {
-         "chords" : [],
-         "haptics" : [],
-         "poses" : [],
-         "skeleton" : [],
-         "sources" : [
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/NonDominantHand/in/cancel"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/y"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/NonDominantHand/in/cancel"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/y"
-            }
-         ]
-      },
-      "/actions/RotationHand" : {
-         "chords" : [],
-         "haptics" : [],
-         "poses" : [],
-         "skeleton" : [],
-         "sources" : [
-            {
-               "inputs" : {
-                  "position" : {
-                     "output" : "/actions/rotationhand/in/rotate"
-                  }
-               },
-               "mode" : "joystick",
-               "path" : "/user/hand/left/input/joystick"
-            },
-            {
-               "inputs" : {
-                  "east" : {
-                     "output" : "/actions/rotationhand/in/snapturnright"
-                  },
-                  "west" : {
-                     "output" : "/actions/rotationhand/in/snapturnleft"
-                  }
-               },
-               "mode" : "dpad",
-               "parameters" : {
-                  "sub_mode" : "touch"
-               },
-               "path" : "/user/hand/left/input/joystick"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/rotationhand/in/locomotionaction"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/x"
-            },
-            {
-               "inputs" : {
-                  "position" : {
-                     "output" : "/actions/rotationhand/in/rotate"
-                  }
-               },
-               "mode" : "joystick",
-               "path" : "/user/hand/right/input/joystick"
-            },
-            {
-               "inputs" : {
-                  "east" : {
-                     "output" : "/actions/rotationhand/in/snapturnright"
-                  },
-                  "west" : {
-                     "output" : "/actions/rotationhand/in/snapturnleft"
-                  }
-               },
-               "mode" : "dpad",
-               "parameters" : {
-                  "sub_mode" : "touch"
-               },
-               "path" : "/user/hand/right/input/joystick"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/rotationhand/in/jump"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/x"
-            },
-            {
-               "inputs" : {
-                  "east" : {
-                     "output" : "/actions/rotationhand/in/nextpage"
-                  },
-                  "north" : {
-                     "output" : "/actions/rotationhand/in/uiup"
-                  },
-                  "south" : {
-                     "output" : "/actions/rotationhand/in/uidown"
-                  },
-                  "west" : {
-                     "output" : "/actions/rotationhand/in/previouspage"
-                  }
-               },
-               "mode" : "dpad",
-               "parameters" : {
-                  "sub_mode" : "touch"
-               },
-               "path" : "/user/hand/left/input/joystick"
-            },
-            {
-               "inputs" : {
-                  "east" : {
-                     "output" : "/actions/rotationhand/in/nextpage"
-                  },
-                  "north" : {
-                     "output" : "/actions/rotationhand/in/uiup"
-                  },
-                  "south" : {
-                     "output" : "/actions/rotationhand/in/uidown"
-                  },
-                  "west" : {
-                     "output" : "/actions/rotationhand/in/previouspage"
-                  }
-               },
-               "mode" : "dpad",
-               "parameters" : {
-                  "sub_mode" : "touch"
-               },
-               "path" : "/user/hand/right/input/joystick"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/rotationhand/in/jump"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/a"
-            }
-         ]
-      },
       "/actions/default" : {
          "haptics" : [
             {
@@ -315,16 +64,7 @@
                },
                "mode" : "trigger",
                "path" : "/user/hand/right/input/trigger"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/dominanthand/in/seeingtool"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/y"
-            },
+            },            
             {
                "inputs" : {
                   "click" : {
@@ -364,30 +104,6 @@
             },
             {
                "inputs" : {
-                  "north" : {
-                     "output" : "/actions/movementhand/in/teleport"
-                  }
-               },
-               "mode" : "dpad",
-               "parameters" : {
-                  "sub_mode" : "touch"
-               },
-               "path" : "/user/hand/left/input/joystick"
-            },
-            {
-               "inputs" : {
-                  "north" : {
-                     "output" : "/actions/movementhand/in/teleport"
-                  }
-               },
-               "mode" : "dpad",
-               "parameters" : {
-                  "sub_mode" : "touch"
-               },
-               "path" : "/user/hand/right/input/joystick"
-            },
-            {
-               "inputs" : {
                   "click" : {
                      "output" : "/actions/movementhand/in/run"
                   }
@@ -420,24 +136,6 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/nondominanthand/in/pause"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/y"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/nondominanthand/in/expoinvert"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/x"
-            },
-            {
-               "inputs" : {
-                  "click" : {
                      "output" : "/actions/nondominanthand/in/interact"
                   }
                },
@@ -447,11 +145,11 @@
             {
                "inputs" : {
                   "click" : {
-                     "output" : "/actions/nondominanthand/in/expoinvert"
+                     "output" : "/actions/nondominanthand/in/pause"
                   }
                },
                "mode" : "button",
-               "path" : "/user/hand/right/input/x"
+               "path" : "/user/hand/left/input/y"
             },
             {
                "inputs" : {
@@ -460,35 +158,12 @@
                   }
                },
                "mode" : "button",
-               "path" : "/user/hand/right/input/y"
-            },
-            {
-               "inputs" : {},
-               "mode" : "button",
-               "path" : "/user/hand/right/input/a"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/nondominanthand/in/pause"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/b"
+               "path" : "/user/hand/left/input/b"
             }
          ]
       },
       "/actions/rotationhand" : {
          "sources" : [
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/rotationhand/in/jump"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/x"
-            },
             {
                "inputs" : {
                   "east" : {
@@ -513,6 +188,27 @@
             {
                "inputs" : {
                   "east" : {
+                     "output" : "/actions/rotationhand/in/next"
+                  },
+                  "north" : {
+                     "output" : "/actions/rotationhand/in/uiup"
+                  },
+                  "south" : {
+                     "output" : "/actions/rotationhand/in/uidown"
+                  },
+                  "west" : {
+                     "output" : "/actions/rotationhand/in/previous"
+                  }
+               },
+               "mode" : "dpad",
+               "parameters" : {
+                  "sub_mode" : "touch"
+               },
+               "path" : "/user/hand/right/input/joystick"
+            },
+            {
+               "inputs" : {
+                  "east" : {
                      "output" : "/actions/rotationhand/in/snapturnright"
                   },
                   "west" : {
@@ -527,12 +223,36 @@
             },
             {
                "inputs" : {
+                  "east" : {
+                     "output" : "/actions/rotationhand/in/snapturnright"
+                  },
+                  "west" : {
+                     "output" : "/actions/rotationhand/in/snapturnleft"
+                  }
+               },
+               "mode" : "dpad",
+               "parameters" : {
+                  "sub_mode" : "touch"
+               },
+               "path" : "/user/hand/right/input/joystick"
+            },
+            {
+               "inputs" : {
                   "position" : {
                      "output" : "/actions/rotationhand/in/rotate"
                   }
                },
                "mode" : "joystick",
                "path" : "/user/hand/left/input/joystick"
+            },
+            {
+               "inputs" : {
+                  "position" : {
+                     "output" : "/actions/rotationhand/in/rotate"
+                  }
+               },
+               "mode" : "joystick",
+               "path" : "/user/hand/right/input/joystick"
             },
             {
                "inputs" : {
@@ -545,48 +265,12 @@
             },
             {
                "inputs" : {
-                  "east" : {
-                     "output" : "/actions/rotationhand/in/next"
-                  },
-                  "north" : {
-                     "output" : "/actions/rotationhand/in/uiup"
-                  },
-                  "south" : {
-                     "output" : "/actions/rotationhand/in/uidown"
-                  },
-                  "west" : {
-                     "output" : "/actions/rotationhand/in/previous"
+                  "click" : {
+                     "output" : "/actions/rotationhand/in/cancel"
                   }
                },
-               "mode" : "dpad",
-               "parameters" : {
-                  "sub_mode" : "touch"
-               },
-               "path" : "/user/hand/right/input/joystick"
-            },
-            {
-               "inputs" : {
-                  "east" : {
-                     "output" : "/actions/rotationhand/in/snapturnright"
-                  },
-                  "west" : {
-                     "output" : "/actions/rotationhand/in/snapturnleft"
-                  }
-               },
-               "mode" : "dpad",
-               "parameters" : {
-                  "sub_mode" : "touch"
-               },
-               "path" : "/user/hand/right/input/joystick"
-            },
-            {
-               "inputs" : {
-                  "position" : {
-                     "output" : "/actions/rotationhand/in/rotate"
-                  }
-               },
-               "mode" : "joystick",
-               "path" : "/user/hand/right/input/joystick"
+               "mode" : "button",
+               "path" : "/user/hand/right/input/b"
             },
             {
                "inputs" : {
@@ -596,16 +280,7 @@
                },
                "mode" : "button",
                "path" : "/user/hand/right/input/x"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/rotationhand/in/cancel"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/y"
-            },
+            },            
             {
                "inputs" : {
                   "click" : {
@@ -614,15 +289,6 @@
                },
                "mode" : "button",
                "path" : "/user/hand/right/input/a"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/rotationhand/in/cancel"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/b"
             }
          ]
       }

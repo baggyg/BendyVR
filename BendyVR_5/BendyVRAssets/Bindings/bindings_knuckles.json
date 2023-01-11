@@ -112,30 +112,6 @@
             },
             {
                "inputs" : {
-                  "north" : {
-                     "output" : "/actions/movementhand/in/teleport"
-                  }
-               },
-               "mode" : "dpad",
-               "parameters" : {
-                  "sub_mode" : "click"
-               },
-               "path" : "/user/hand/left/input/trackpad"
-            },
-            {
-               "inputs" : {
-                  "north" : {
-                     "output" : "/actions/movementhand/in/teleport"
-                  }
-               },
-               "mode" : "dpad",
-               "parameters" : {
-                  "sub_mode" : "click"
-               },
-               "path" : "/user/hand/right/input/trackpad"
-            },
-            {
-               "inputs" : {
                   "click" : {
                      "output" : "/actions/movementhand/in/run"
                   }
@@ -191,40 +167,15 @@
                },
                "mode" : "trigger",
                "path" : "/user/hand/right/input/trigger"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/nondominanthand/in/expoinvert"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/a"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/nondominanthand/in/expoinvert"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/a"
             }
          ]
-      },
-      "/actions/platformer" : {
-         "chords" : [],
-         "haptics" : [],
-         "poses" : [],
-         "skeleton" : [],
-         "sources" : []
       },
       "/actions/rotationhand" : {
          "sources" : [
             {
                "inputs" : {
                   "east" : {
-                     "output" : "/actions/rotationhand/in/snapturnright"
+                     "output" : "/actions/rotationhand/in/next"
                   },
                   "north" : {
                      "output" : "/actions/rotationhand/in/uiup"
@@ -232,6 +183,42 @@
                   "south" : {
                      "output" : "/actions/rotationhand/in/uidown"
                   },
+                  "west" : {
+                     "output" : "/actions/rotationhand/in/previous"
+                  }
+               },
+               "mode" : "dpad",
+               "parameters" : {
+                  "sub_mode" : "touch"
+               },
+               "path" : "/user/hand/left/input/thumbstick"
+            },
+            {
+               "inputs" : {
+                  "east" : {
+                     "output" : "/actions/rotationhand/in/next"
+                  },
+                  "north" : {
+                     "output" : "/actions/rotationhand/in/uiup"
+                  },
+                  "south" : {
+                     "output" : "/actions/rotationhand/in/uidown"
+                  },
+                  "west" : {
+                     "output" : "/actions/rotationhand/in/previous"
+                  }
+               },
+               "mode" : "dpad",
+               "parameters" : {
+                  "sub_mode" : "touch"
+               },
+               "path" : "/user/hand/right/input/thumbstick"
+            },
+            {
+               "inputs" : {
+                  "east" : {
+                     "output" : "/actions/rotationhand/in/snapturnright"
+                  },                  
                   "west" : {
                      "output" : "/actions/rotationhand/in/snapturnleft"
                   }
@@ -246,13 +233,7 @@
                "inputs" : {
                   "east" : {
                      "output" : "/actions/rotationhand/in/snapturnright"
-                  },
-                  "north" : {
-                     "output" : "/actions/rotationhand/in/uiup"
-                  },
-                  "south" : {
-                     "output" : "/actions/rotationhand/in/uidown"
-                  },
+                  },                  
                   "west" : {
                      "output" : "/actions/rotationhand/in/snapturnleft"
                   }
@@ -262,24 +243,6 @@
                   "sub_mode" : "touch"
                },
                "path" : "/user/hand/right/input/thumbstick"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/rotationhand/in/previous"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/b"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/rotationhand/in/previous"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/b"
             },
             {
                "inputs" : {
@@ -334,25 +297,7 @@
                },
                "mode" : "button",
                "path" : "/user/hand/right/input/b"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/rotationhand/in/next"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/left/input/a"
-            },
-            {
-               "inputs" : {
-                  "click" : {
-                     "output" : "/actions/rotationhand/in/next"
-                  }
-               },
-               "mode" : "button",
-               "path" : "/user/hand/right/input/a"
-            }
+            }            
          ]
       }
    },

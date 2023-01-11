@@ -1,6 +1,7 @@
 ﻿using BendyVR_5.Helpers;
 using BendyVR_5.Settings;
 using HarmonyLib;
+using I2.Loc;
 using InControl;
 using TMG.Data;
 using UnityEngine;
@@ -13,18 +14,205 @@ namespace TwoForksVr.Settings.Patches;
 public class GameSettingsPatches
 {
     [HarmonyPrefix]
+    [HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.Initialize))]
+    public static bool VRInitializeSettings(PlayerSettings __instance)
+    {
+        //GB Updated one so I could reset prefs
+        if (!PlayerPrefs.HasKey("v1.5.0.1"))
+        {
+            Debug.Log("Resetting Player Prefs");
+            PlayerPrefs.DeleteAll();
+            PlayerPrefsManager.Save("v1.5.0.1", 1);
+        }
+        if (!PlayerPrefs.HasKey("BRIGHTNESS"))
+        {
+            Debug.Log("Initializing Brightness");
+            PlayerPrefsManager.Save("BRIGHTNESS", 0.5f);
+        }
+        if (!PlayerPrefs.HasKey("QUALITY"))
+        {
+            Debug.Log("Initializing Quality");
+            PlayerPrefsManager.Save("QUALITY", 3);
+        }
+        if (!PlayerPrefs.HasKey("VOLUME"))
+        {
+            Debug.Log("Initializing Volume");
+            PlayerPrefsManager.Save("VOLUME", 1f);
+        }
+        if (!PlayerPrefs.HasKey("MUSIC_VOLUME"))
+        {
+            Debug.Log("Initializing Music Volume");
+            PlayerPrefsManager.Save("MUSIC_VOLUME", 0.95f);
+        }
+        if (!PlayerPrefs.HasKey("SFX_VOLUME"))
+        {
+            Debug.Log("Initializing SFX Volume");
+            PlayerPrefsManager.Save("SFX_VOLUME", 0.95f);
+        }
+        if (!PlayerPrefs.HasKey("DIALOGUE_VOLUME"))
+        {
+            Debug.Log("Initializing Dialogue Volume");
+            PlayerPrefsManager.Save("DIALOGUE_VOLUME", 0.95f);
+        }
+        if (!PlayerPrefs.HasKey("SUBTITLES"))
+        {
+            Debug.Log("Initializing Subtitles");
+            PlayerPrefsManager.Save("SUBTITLES", 0);
+        }
+        if (!PlayerPrefs.HasKey("LANGUAGE"))
+        {
+            Debug.Log("Initializing Language");
+            string value = (LocalizationManager.CurrentLanguageCode = LocalizationManager.GetLanguageCode(LocalizationManager.GetCurrentDeviceLanguage()));
+            PlayerPrefsManager.Save("LANGUAGE", value);
+        }
+        if (!PlayerPrefs.HasKey("INVERTED"))
+        {
+            Debug.Log("Initializing Inverted");
+            PlayerPrefsManager.Save("INVERTED", 0);
+        }
+        if (!PlayerPrefs.HasKey("CROSSHAIR"))
+        {
+            Debug.Log("Initializing Crosshair");
+            PlayerPrefsManager.Save("CROSSHAIR", 0);
+        }
+        if (!PlayerPrefs.HasKey("SENSITIVITY"))
+        {
+            Debug.Log("Initializing Look Sensitivity");
+            PlayerPrefsManager.Save("SENSITIVITY", 0.25f);
+        }
+        if (!PlayerPrefs.HasKey("BLOOM"))
+        {
+            Debug.Log("Initializing Bloom Lighting");
+            PlayerPrefsManager.Save("BLOOM", 1);
+        }
+        if (!PlayerPrefs.HasKey("DOF"))
+        {
+            Debug.Log("Initializing Depth of Field");
+            PlayerPrefsManager.Save("DOF", 0);
+        }
+        if (!PlayerPrefs.HasKey("VOLUMETRIC_LIGHT"))
+        {
+            Debug.Log("Initializing Volumetric Lighting");
+            PlayerPrefsManager.Save("VOLUMETRIC_LIGHT", 0);
+        }
+        if (!PlayerPrefs.HasKey("AMBIENT_OCCLUSION"))
+        {
+            Debug.Log("Initializing Ambient Occlusion");
+            PlayerPrefsManager.Save("AMBIENT_OCCLUSION", 0);
+        }
+        if (!PlayerPrefs.HasKey("GRAIN"))
+        {
+            Debug.Log("Initializing Grain");
+            PlayerPrefsManager.Save("GRAIN", 0);
+        }
+        if (!PlayerPrefs.HasKey("MOTION_BLUR"))
+        {
+            Debug.Log("Initializing Motion Blur");
+            PlayerPrefsManager.Save("MOTION_BLUR", 0);
+        }
+        if (!PlayerPrefs.HasKey("ANTI_ALIASING"))
+        {
+            Debug.Log("Initializing Anti Aliasing");
+            PlayerPrefsManager.Save("ANTI_ALIASING", 1);
+        }
+        if (!PlayerPrefs.HasKey("V_SYNC"))
+        {
+            Debug.Log("Initializing V-Sync");
+            PlayerPrefsManager.Save("V_SYNC", 1);
+        }
+        if (!PlayerPrefs.HasKey("VIEW_BOBBING"))
+        {
+            Debug.Log("Initializing View Bobbing");
+            PlayerPrefsManager.Save("VIEW_BOBBING", 0);
+        }
+        if (!PlayerPrefs.HasKey("VIEW_SWAYING"))
+        {
+            Debug.Log("Initializing View Swaying");
+            PlayerPrefsManager.Save("VIEW_SWAYING", 0);
+        }
+        if (!PlayerPrefs.HasKey("SHADOWS"))
+        {
+            Debug.Log("Initializing Shadow");
+            PlayerPrefsManager.Save("SHADOWS", 1);
+        }
+        if (!PlayerPrefs.HasKey("FOG"))
+        {
+            Debug.Log("Initializing Fog");
+            PlayerPrefsManager.Save("FOG", 1);
+        }
+        if (!PlayerPrefs.HasKey("DUST_PARTICLES"))
+        {
+            Debug.Log("Initializing Dust Particles");
+            PlayerPrefsManager.Save("DUST_PARTICLES", 1);
+        }
+        if (!PlayerPrefs.HasKey("TIPS"))
+        {
+            Debug.Log("Initializing TIPS");
+            PlayerPrefsManager.Save("TIPS", 1);
+        }
+
+        //Overside according the config
+        Debug.Log("Forcing Inverted");
+        PlayerPrefsManager.Save("INVERTED", 0);
+        Debug.Log("Forcing Crosshair");
+        PlayerPrefsManager.Save("CROSSHAIR", 0);
+        Debug.Log("Forcing Volumetric Lighting");
+        PlayerPrefsManager.Save("VOLUMETRIC_LIGHT", 0);
+        Debug.Log("Forcing Volumetric Lighting");
+        PlayerPrefsManager.Save("VOLUMETRIC_LIGHT", 0);
+        Debug.Log("Forcing Grain");
+        PlayerPrefsManager.Save("GRAIN", 0);
+        Debug.Log("Forcing Motion Blur");
+        PlayerPrefsManager.Save("MOTION_BLUR", 0);        
+        Debug.Log("Forcing View Swaying");
+        PlayerPrefsManager.Save("VIEW_SWAYING", 0);
+        PlayerPrefsManager.Save("FOG", VrSettings.EnableParticles.Value ? 1 : 0);
+        PlayerPrefsManager.Save("DUST_PARTICLES", VrSettings.EnableParticles.Value ? 1 : 0);
+        PlayerPrefsManager.Save("VIEW_BOBBING", VrSettings.EnableHeadBob.Value ? 1 : 0);
+
+        LocalizationManager.CurrentLanguageCode = GameManager.Instance.PlayerSettings.Language;
+        __instance.InitializeQuality();
+        __instance.InitializeResolution();
+        return false;
+    }
+
+    [HarmonyPrefix]
     [HarmonyPatch(typeof(InputManager), nameof(InputManager.InvertYAxis), MethodType.Setter)]
     [HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.MotionBlur), MethodType.Setter)]
-    [HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.ViewBobbing), MethodType.Setter)]
+    //[HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.ViewBobbing), MethodType.Setter)]
     [HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.ViewSwaying), MethodType.Setter)]
     [HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.Inverted), MethodType.Setter)]
     [HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.Crosshair), MethodType.Setter)]
     [HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.VolumetricLighting), MethodType.Setter)]
     [HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.Grain), MethodType.Setter)]
-    private static void ForceDisableBoolSetting(ref bool value)
+    private static bool ForceDisableBoolSetting(ref bool value)
     {
         value = false;
+        return false;
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(OptionsControls), nameof(OptionsControls.HandleViewBobbingValueChange))]
+    public static bool HandleViewBobbingValueChange()
+    {        
+        GameManager.Instance.PlayerSettings.ViewBobbing = !GameManager.Instance.PlayerSettings.ViewBobbing;
+        VrSettings.EnableHeadBob.Value = GameManager.Instance.PlayerSettings.ViewBobbing;
+        return false;
+    }
+
+    /*[HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.ViewBobbing), MethodType.Setter)]
+    private static bool AlignViewBobbing(ref bool value)
+    {
+        value = VrSettings.EnableHeadBob.Value;
+        return false;
+    }
+
+    [HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.ViewBobbing), MethodType.Getter)]
+    private static bool GetViewBobbing(ref bool value)
+    {
+        value = VrSettings.EnableHeadBob.Value;
+        return false;
+    }*/
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(OptionsMenuController), nameof(OptionsMenuController.GenerateAdvancedMenu))]
@@ -212,25 +400,5 @@ public class GameSettingsPatches
     }*/
           
 
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(PlayerSettings), nameof(PlayerSettings.Initialize))]
-    private static void OverrideDefaultSettings(PlayerSettings __instance)
-    {
-        Debug.Log("Forcing Inverted");
-        PlayerPrefsManager.Save("INVERTED", 0);
-        Debug.Log("Forcing Crosshair");
-        PlayerPrefsManager.Save("CROSSHAIR", 0);
-        Debug.Log("Forcing Volumetric Lighting");
-        PlayerPrefsManager.Save("VOLUMETRIC_LIGHT", 0);
-        Debug.Log("Forcing Volumetric Lighting");
-        PlayerPrefsManager.Save("VOLUMETRIC_LIGHT", 0);
-        Debug.Log("Forcing Grain");
-        PlayerPrefsManager.Save("GRAIN", 0);
-        Debug.Log("Forcing Motion Blur");
-        PlayerPrefsManager.Save("MOTION_BLUR", 0);
-        Debug.Log("Forcing View Bobbing");
-        PlayerPrefsManager.Save("VIEW_BOBBING", 0);
-        Debug.Log("Forcing View Swaying");
-        PlayerPrefsManager.Save("VIEW_SWAYING", 0);
-    }
+    
 }
