@@ -1,6 +1,11 @@
 # ![Bendy VR](https://github.com/baggyg/BendyVR/blob/main/WebsiteAssets/BendyVRGithub.jpg)
 
-**Update (18/01/2023): Pico 3 / 4 - If you are using the Streaming Assistant, Pico are aware they have a problem with skeleton bindings. They have stated: 'skeleton will be added in streaming assistant version 9.4.*. This version will be released at the end of February'. In the meantime if you want to play on Pico you will need Virtual Desktop.**
+**Update (October 2024 - Current): To play this game in VR you must use the release-1.5 beta accessed via the Steam Beta Participation**
+
+![image](https://github.com/user-attachments/assets/4a55d2f2-7f5c-4c24-85fd-b07ed239a121)
+
+
+Update (18/01/2023): Pico 3 / 4 - If you are using the Streaming Assistant, Pico are aware they have a problem with skeleton bindings. They have stated: 'skeleton will be added in streaming assistant version 9.4.*. This version will be released at the end of February'. In the meantime if you want to play on Pico you will need Virtual Desktop.
 
 Bendy VR is a VR mod for [Bendy and the Ink Machine](https://store.steampowered.com/app/622650/Bendy_and_the_Ink_Machine/), with full motion control support. This is Team Beef's very first (of hopefully many) PCVR mods. 
 
