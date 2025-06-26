@@ -1,6 +1,6 @@
 # ![Bendy VR](https://github.com/baggyg/BendyVR/blob/main/WebsiteAssets/BendyVRGithub.jpg)
 
-**Update (June 2025) - I'm currently looking into the differences in the hotfix now, to hopefully get a patch out**
+**Update (June 2025) - As of now the latest version on Steam doesn't appear to start at all with this mod. I'm investigating but looks to be a little more serious than just fixing a single function. I will continue and either patch this up or make the move over to UUVR. More to follow...**
 
 ~~**Update (October 2024 - Current): To play this game in VR you must use the release-1.5 beta accessed via the Steam Beta Participation**~~
 Update (18/01/2023): Pico 3 / 4 - If you are using the Streaming Assistant, Pico are aware they have a problem with skeleton bindings. They have stated: 'skeleton will be added in streaming assistant version 9.4.*. This version will be released at the end of February'. In the meantime if you want to play on Pico you will need Virtual Desktop.
@@ -43,7 +43,7 @@ If anyone is having an issue with BendyVR install, please follow the below proce
 
 ## Requirements
 
-- A compatible version of Bendy and the Ink Machine. Currently that's version 1.1.2. This version is available in these stores:
+- A compatible version of Bendy and the Ink Machine. Currently that's version 1.2.2. This version is available in these stores:
   - [Steam](https://store.steampowered.com/app/622650/Bendy_and_the_Ink_Machine/)  
 - A PC ready for PCVR. Bendy VR doesn't work on standalone VR platforms.
 - An OpenVR-compatible VR headset. Examples:
